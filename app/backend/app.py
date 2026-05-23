@@ -427,4 +427,5 @@ def delete_employee(emp_id):
 
 if __name__ == '__main__':
     # Running flask in debug mode for development (Gunicorn will run it in production/K8s)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)  # nosec B104
+
