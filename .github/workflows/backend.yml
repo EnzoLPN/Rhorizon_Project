@@ -1,0 +1,145 @@
+name: Backend Pipeline
+
+on:
+  push:
+    paths:
+      - 'app/backend/**'
+  pull_request:
+    paths:
+      - 'app/backend/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    name: Backend Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd app/backend
+          pip install Flask Flask-Cors
+
+      - name: Run Unit Tests
+        run: |
+          cd app/backend
+          python -m unittest test_app
+
+      - name: Run Bandit (SAST)
+        run: |
+          pip install bandit
+          bandit -r app/backend/ -ll
+
+      - name: Run Pip-Audit (SCA)
+        run: |
+          pip install pip-audit
+          pip-audit -r app/backend/requirements.txt
+
+  build:
+    name: Backend Build & Push
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set short git commit SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
+          aws-region: eu-west-1
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: 116101833976.dkr.ecr.eu-west-1.amazonaws.com
+          ECR_REPOSITORY: rhzorion/backend
+          IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app/backend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  scan:
+    name: Backend Container Scan
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set short git commit SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
+          aws-region: eu-west-1
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Scan Image with Trivy
+        uses: aquasec/trivy-action@master
+        with:
+          image-ref: 116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/backend:${{ steps.vars.outputs.sha_short }}
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'HIGH,CRITICAL'
+
+  deploy:
+    name: Backend Deploy to EKS Nonprod
+    needs: scan
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set short git commit SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
+          aws-region: eu-west-1
+
+      - name: Assume Cross-Account Nonprod Role
+        run: |
+          ASSUME_OUTPUT=$(aws sts assume-role --role-arn "arn:aws:iam::083127296598:role/OrganizationAccountAccessRole" --role-session-name "EKSBackendDeploy" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+          echo "AWS_ACCESS_KEY_ID=$(echo "$ASSUME_OUTPUT" | awk '{print $1}')" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(echo "$ASSUME_OUTPUT" | awk '{print $2}')" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(echo "$ASSUME_OUTPUT" | awk '{print $3}')" >> $GITHUB_ENV
+
+      - name: Update Kubeconfig
+        run: |
+          aws eks update-kubeconfig --name nonprod-eks-cluster --region eu-west-1
+
+      - name: Deploy to EKS
+        env:
+          IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+        run: |
+          kubectl set image deployment/rhorizon-backend backend=116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/backend:$IMAGE_TAG -n rhorizon
+          kubectl rollout status deployment/rhorizon-backend -n rhorizon --timeout=120s
