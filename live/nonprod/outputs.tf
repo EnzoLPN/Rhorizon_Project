@@ -6,7 +6,7 @@ output "vpc_id" {
 
 output "private_subnet_ids" {
   value       = module.network.private_subnet_ids
-  description = "IDs des sous-réseaux privés"
+  description = "IDDs des sous-réseaux privés"
 }
 
 # --- Outputs EKS ---
