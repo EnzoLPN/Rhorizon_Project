@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard de test et de validation de l'infrastructure SaaS RHZORION. Connectivité, base de données et performances.">
+    <title>RHZORION - Infrastructure Test Dashboard</title>
+    <!-- Outfit & Inter Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-decorations">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header / Nav -->
+        <header class="app-header">
+            <div class="brand">
+                <span class="logo-symbol">RH</span>
+                <div class="brand-text">
+                    <h1>RHZORION</h1>
+                    <span class="sub-title">Plateforme SaaS RH • Pilotage Infra</span>
+                </div>
+            </div>
+            <div class="status-badge-container">
+                <span class="status-label">Statut global :</span>
+                <div id="global-status-badge" class="badge badge-checking">
+                    <span class="indicator-dot"></span>
+                    <span class="badge-text">Vérification...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-grid">
+            <!-- Left Column: DB and S3 Status -->
+            <div class="status-column">
+                <section class="card status-panel">
+                    <h2>Statut de la Base de Données</h2>
+                    <p class="section-desc">Métadonnées de la connexion active à notre base PostgreSQL isolée.</p>
+
+                    <div class="db-status-card">
+                        <div class="status-row">
+                            <span class="status-key">Hôte de base de données :</span>
+                            <span id="db-host" class="status-value">--</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-key">Nom de la base :</span>
+                            <span id="db-name" class="status-value">--</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-key">Statut de la connexion :</span>
+                            <span id="db-conn-status" class="status-value status-unknown">Vérification...</span>
+                        </div>
+                        <div class="status-row error-row" id="db-error-row" style="display: none;">
+                            <span class="status-key">Erreur :</span>
+                            <span id="db-error-msg" class="status-value error-text">Aucune</span>
+                        </div>
+                    </div>
+
+                    <div class="info-note">
+                        <h3>Note sur l'isolation</h3>
+                        <p>Cette application de démonstration tourne sur les nœuds de calcul privés d'EKS. Toutes les connexions vers le service RDS PostgreSQL transitent via des sous-réseaux isolés sans exposition directe sur Internet.</p>
+                    </div>
+                </section>
+
+                <section class="card s3-panel">
+                    <h2>Statut du Stockage S3</h2>
+                    <p class="section-desc">Validation de la connectivité réseau et des permissions IAM (IRSA).</p>
+
+                    <div class="s3-status-card">
+                        <div class="status-row">
+                            <span class="status-key">Bucket S3 :</span>
+                            <span id="s3-bucket" class="status-value">--</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-key">Région AWS :</span>
+                            <span id="s3-region" class="status-value">--</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-key">Statut S3 :</span>
+                            <div id="s3-conn-badge" class="badge badge-checking">
+                                <span class="indicator-dot"></span>
+                                <span class="badge-text">Vérification...</span>
+                            </div>
+                        </div>
+                        <div class="status-row error-row" id="s3-error-row" style="display: none;">
+                            <span class="status-key">Erreur :</span>
+                            <span id="s3-error-msg" class="status-value error-text">Aucune</span>
+                        </div>
+                    </div>
+
+                    <div class="s3-test-action">
+                        <button type="button" id="test-s3-btn" class="btn btn-primary btn-full-width">
+                            <span class="btn-text">Tester le Stockage S3</span>
+                            <span class="spinner" id="s3-spinner" style="display: none;"></span>
+                        </button>
+                    </div>
+
+                    <div class="s3-logs-container" id="s3-logs-container" style="display: none;">
+                        <h3>Rapport de diagnostic</h3>
+                        <div class="s3-logs" id="s3-logs">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Middle Panel: Add Employee Form -->
+            <section class="card form-panel">
+                <h2>Enregistrer un Employé</h2>
+                <p class="section-desc">Ajouter un collaborateur pour tester l'écriture en base de données.</p>
+
+                <form id="add-employee-form" class="premium-form">
+                    <div class="form-group">
+                        <label for="emp-name">Nom complet</label>
+                        <input type="text" id="emp-name" placeholder="ex. Jeanne Dupont" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-email">Adresse e-mail professionnelle</label>
+                        <input type="email" id="emp-email" placeholder="ex. jeanne.dupont@rhorizon.xyz" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-role">Poste / Rôle</label>
+                        <input type="text" id="emp-role" placeholder="ex. Développeur Fullstack" required>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn btn-primary">
+                        <span class="btn-text">Enregistrer le collaborateur</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                    <div id="form-message" class="message-banner" style="display: none;"></div>
+                </form>
+            </section>
+
+            <!-- Right/Bottom Panel: Employees List -->
+            <section class="card list-panel">
+                <div class="list-header">
+                    <h2>Collaborateurs Enregistrés</h2>
+                    <button id="refresh-list-btn" class="btn btn-secondary" aria-label="Rafraîchir la liste">
+                        <svg class="refresh-icon" viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
+                <p class="section-desc">Données lues en temps réel depuis l'API REST de nonprod/prod.</p>
+
+                <div class="table-wrapper">
+                    <table id="employees-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Poste</th>
+                                <th>Date d'ajout</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employees-list-body">
+                            <tr class="placeholder-row">
+                                <td colspan="6">Chargement de la liste...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2026 RHZORION SaaS. Déploiement sécurisé AWS EKS & RDS • Conforme RGPD & Recommandations ANSSI.</p>
+        </footer>
+    </div>
+
+    <!-- Edit Employee Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2>Modifier le Collaborateur</h2>
+                <button type="button" class="close-modal" id="close-modal-btn">&times;</button>
+            </div>
+            <form id="edit-employee-form" class="premium-form">
+                <input type="hidden" id="edit-emp-id">
+                <div class="form-group">
+                    <label for="edit-emp-name">Nom complet</label>
+                    <input type="text" id="edit-emp-name" required autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="edit-emp-email">Adresse e-mail professionnelle</label>
+                    <input type="email" id="edit-emp-email" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="edit-emp-role">Poste / Rôle</label>
+                    <input type="text" id="edit-emp-role" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit-btn">Annuler</button>
+                    <button type="submit" id="edit-submit-btn" class="btn btn-primary">
+                        <span class="btn-text">Enregistrer</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </div>
+                <div id="edit-form-message" class="message-banner" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>

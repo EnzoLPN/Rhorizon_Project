@@ -1,0 +1,46 @@
+stages:
+  - triggers
+
+# --- trigger backend pipeline ---
+trigger_backend:
+  stage: triggers
+  trigger:
+    include: app/backend/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - changes:
+        - app/backend/**/*
+
+# --- trigger frontend pipeline ---
+trigger_frontend:
+  stage: triggers
+  trigger:
+    include: app/frontend/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - changes:
+        - app/frontend/**/*
+
+# --- trigger nonprod infra pipeline ---
+# (Commenté temporairement pour l'arrêt de l'infra nonprod)
+# trigger_infra_nonprod:
+#   stage: triggers
+#   trigger:
+#     include: live/nonprod/.gitlab-ci.yml
+#     strategy: depend
+#   rules:
+#     - changes:
+#         - live/nonprod/**/*
+#         - modules/**/*
+
+# --- trigger prod infra pipeline ---
+# (Commenté temporairement pour l'arrêt de l'infra)
+# trigger_infra_prod:
+#   stage: triggers
+#   trigger:
+#     include: live/prod/.gitlab-ci.yml
+#     strategy: depend
+#   rules:
+#     - changes:
+#         - live/prod/**/*
+#         - modules/**/*

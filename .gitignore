@@ -1,0 +1,39 @@
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/
+.pytest_cache/
+
+# Terraform / Terragrunt
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+!terraform.tfvars
+tfplan
+tfplan.*
+.terragrunt-cache/
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

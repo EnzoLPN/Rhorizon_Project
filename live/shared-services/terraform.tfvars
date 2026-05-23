@@ -1,0 +1,7 @@
+bucket_prefix      = "rhorizon-monprojet"
+nonprod_account_id = "083127296598"
+prod_account_id    = "593402827099"
+gitlab_organization = "eloppinantimi"
+gitlab_project      = "infrastructure"
+aws_profile        = "aws-shared"
+aws_region         = "eu-west-1"
