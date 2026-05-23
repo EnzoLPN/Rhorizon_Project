@@ -1,7 +1,8 @@
 // Determine API base URL dynamically:
+// (Triggered rebuild with unique tag timestamps)
 // If running on a unified Ingress (e.g. EKS ALB), we can use relative path '/api'.
-// For local non-proxy development, we can check if backend runs on port 5000.
 const API_BASE = '/api';
+
 
 // DOM Elements
 const globalStatusBadge = document.getElementById('global-status-badge');
