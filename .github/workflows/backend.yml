@@ -102,16 +102,13 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Scan Image with Trivy
-        uses: aquasecurity/trivy-action@v0.28.0
+      - name: Pull image from ECR
+        run: |
+          docker pull 116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/backend:${{ needs.build.outputs.image_tag }}
 
-        with:
-          image-ref: 116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/backend:${{ needs.build.outputs.image_tag }}
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'HIGH,CRITICAL'
+      - name: Scan Image with Trivy
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/backend:${{ needs.build.outputs.image_tag }}
 
   deploy:
     name: Backend Deploy to EKS Nonprod
