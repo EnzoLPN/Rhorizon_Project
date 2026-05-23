@@ -4,9 +4,13 @@ on:
   push:
     paths:
       - 'app/backend/**'
+      - '.github/workflows/backend.yml'
   pull_request:
     paths:
       - 'app/backend/**'
+      - '.github/workflows/backend.yml'
+  workflow_dispatch:
+
 
 permissions:
   id-token: write
