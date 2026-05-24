@@ -62,7 +62,8 @@ module "eks_cluster" {
 
   admin_roles = [
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/OrganizationAccountAccessRole",
-    data.terraform_remote_state.shared.outputs.github_actions_nonprod_role_arn
+    data.terraform_remote_state.shared.outputs.github_actions_nonprod_role_arn,
+    aws_iam_role.eks_deploy_role.arn
   ]
   project_name = var.project_name
 }
