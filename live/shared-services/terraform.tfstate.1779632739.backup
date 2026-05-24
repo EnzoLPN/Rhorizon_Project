@@ -1,0 +1,1349 @@
+{
+  "version": 4,
+  "terraform_version": "1.15.3",
+  "serial": 121,
+  "lineage": "72e24c31-1335-e8ee-29b3-8a4b7de665f9",
+  "outputs": {
+    "bucket_assets_arn": {
+      "value": "arn:aws:s3:::rhorizon-app-assets",
+      "type": "string"
+    },
+    "bucket_assets_id": {
+      "value": "rhorizon-app-assets",
+      "type": "string"
+    },
+    "bucket_backups_arn": {
+      "value": "arn:aws:s3:::rhorizon-central-backups",
+      "type": "string"
+    },
+    "bucket_backups_id": {
+      "value": "rhorizon-central-backups",
+      "type": "string"
+    },
+    "bucket_logs_arn": {
+      "value": "arn:aws:s3:::rhorizon-monprojet-audit-logs",
+      "type": "string"
+    },
+    "bucket_logs_id": {
+      "value": "rhorizon-monprojet-audit-logs",
+      "type": "string"
+    },
+    "ecr_repository_arns": {
+      "value": {
+        "rhorizon/backend": "arn:aws:ecr:eu-west-1:116101833976:repository/rhorizon/backend",
+        "rhorizon/frontend": "arn:aws:ecr:eu-west-1:116101833976:repository/rhorizon/frontend"
+      },
+      "type": [
+        "object",
+        {
+          "rhorizon/backend": "string",
+          "rhorizon/frontend": "string"
+        }
+      ]
+    },
+    "ecr_repository_urls": {
+      "value": {
+        "rhorizon/backend": "116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhorizon/backend",
+        "rhorizon/frontend": "116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhorizon/frontend"
+      },
+      "type": [
+        "object",
+        {
+          "rhorizon/backend": "string",
+          "rhorizon/frontend": "string"
+        }
+      ]
+    },
+    "github_actions_nonprod_role_arn": {
+      "value": "arn:aws:iam::116101833976:role/shared-github-actions-nonprod-role",
+      "type": "string"
+    },
+    "github_actions_prod_role_arn": {
+      "value": "arn:aws:iam::116101833976:role/shared-github-actions-prod-role",
+      "type": "string"
+    },
+    "kms_assets_key_arn": {
+      "value": "arn:aws:kms:eu-west-1:116101833976:key/331748f7-769c-42ab-a70d-ae596a7281b5",
+      "type": "string"
+    },
+    "kms_backups_key_arn": {
+      "value": "arn:aws:kms:eu-west-1:116101833976:key/9d57469e-1a50-4ebe-8d8e-a1ab4b499447",
+      "type": "string"
+    },
+    "kms_logs_key_arn": {
+      "value": "arn:aws:kms:eu-west-1:116101833976:key/5bf1157f-2d7e-4512-b370-70dc406dc8c8",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "module": "module.cicd_infra",
+      "mode": "data",
+      "type": "tls_certificate",
+      "name": "github",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tls\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "certificates": [
+              {
+                "cert_pem": "-----BEGIN CERTIFICATE-----\nMIIFBTCCAu2gAwIBAgIQWgDyEtjUtIDzkkFX6imDBTANBgkqhkiG9w0BAQsFADBP\nMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJuZXQgU2VjdXJpdHkgUmVzZWFy\nY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBYMTAeFw0yNDAzMTMwMDAwMDBa\nFw0yNzAzMTIyMzU5NTlaMDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBF\nbmNyeXB0MQwwCgYDVQQDEwNSMTMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK\nAoIBAQClZ3CN0FaBZBUXYc25BtStGZCMJlA3mBZjklTb2cyEBZPs0+wIG6BgUUNI\nfSvHSJaetC3ancgnO1ehn6vw1g7UDjDKb5ux0daknTI+WE41b0VYaHEX/D7YXYKg\nL7JRbLAaXbhZzjVlyIuhrxA3/+OcXcJJFzT/jCuLjfC8cSyTDB0FxLrHzarJXnzR\nyQH3nAP2/Apd9Np75tt2QnDr9E0i2gB3b9bJXxf92nUupVcM9upctuBzpWjPoXTi\ndYJ+EJ/B9aLrAek4sQpEzNPCifVJNYIKNLMc6YjCR06CDgo28EdPivEpBHXazeGa\nXP9enZiVuppD0EqiFwUBBDDTMrOPAgMBAAGjgfgwgfUwDgYDVR0PAQH/BAQDAgGG\nMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATASBgNVHRMBAf8ECDAGAQH/\nAgEAMB0GA1UdDgQWBBTnq58PLDOgU9NeT3jIsoQOO9aSMzAfBgNVHSMEGDAWgBR5\ntFnme7bl5AFzgAiIyBpY9umbbjAyBggrBgEFBQcBAQQmMCQwIgYIKwYBBQUHMAKG\nFmh0dHA6Ly94MS5pLmxlbmNyLm9yZy8wEwYDVR0gBAwwCjAIBgZngQwBAgEwJwYD\nVR0fBCAwHjAcoBqgGIYWaHR0cDovL3gxLmMubGVuY3Iub3JnLzANBgkqhkiG9w0B\nAQsFAAOCAgEAUTdYUqEimzW7TbrOypLqCfL7VOwYf/Q79OH5cHLCZeggfQhDconl\nk7Kgh8b0vi+/XuWu7CN8n/UPeg1vo3G+taXirrytthQinAHGwc/UdbOygJa9zuBc\nVyqoH3CXTXDInT+8a+c3aEVMJ2St+pSn4ed+WkDp8ijsijvEyFwE47hulW0Ltzjg\n9fOV5Pmrg/zxWbRuL+k0DBDHEJennCsAen7c35Pmx7jpmJ/HtgRhcnz0yjSBvyIw\n6L1QIupkCv2SBODT/xDD3gfQQyKv6roV4G2EhfEyAsWpmojxjCUCGiyg97FvDtm/\nNK2LSc9lybKxB73I2+P2G3CaWpvvpAiHCVu30jW8GCxKdfhsXtnIy2imskQqVZ2m\n0Pmxobb28Tucr7xBK7CtwvPrb79os7u2XP3O5f9b/H66GNyRrglRXlrYjI1oGYL/\nf4I1n/Sgusda6WvA6C190kxjU15Y12mHU4+BxyR9cx2hhGS9fAjMZKJss28qxvz6\nAxu4CaDmRNZpK/pQrXF17yXCXkmEWgvSOEZy6Z9pcbLIVEGckV/iVeq0AOo2pkg9\np4QRIy0tK2diRENLSF2KysFwbY6B26BFeFs3v1sYVRhFW9nLkOrQVporCS0KyZmf\nwVD89qSTlnctLcZnIavjKsKUu1nA1iU0yYMdYepKR7lWbnwhdx3ewok=\n-----END CERTIFICATE-----\n",
+                "is_ca": true,
+                "issuer": "CN=ISRG Root X1,O=Internet Security Research Group,C=US",
+                "max_path_length": 0,
+                "not_after": "2027-03-12T23:59:59Z",
+                "not_before": "2024-03-13T00:00:00Z",
+                "public_key_algorithm": "RSA",
+                "serial_number": "119635429456979344322213464088047616773",
+                "sha1_fingerprint": "22ff89586561fc2d52f77491e9f1eff1b80be33e",
+                "signature_algorithm": "SHA256-RSA",
+                "subject": "CN=R13,O=Let's Encrypt,C=US",
+                "version": 3
+              },
+              {
+                "cert_pem": "-----BEGIN CERTIFICATE-----\nMIIGODCCBSCgAwIBAgISBkl0HFXQj/IWarIfFqEXLJuRMA0GCSqGSIb3DQEBCwUA\nMDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQwwCgYDVQQD\nEwNSMTMwHhcNMjYwNTEyMTQ1NDQzWhcNMjYwODEwMTQ1NDQyWjAqMSgwJgYDVQQD\nDB8qLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMIICIjANBgkqhkiG9w0B\nAQEFAAOCAg8AMIICCgKCAgEArLpWC9GkquTIAVjQn1wANwct6Q4PJEWCAqzGNTiq\nKuSBym3zWvjT5ZtxHyqrTEvtEPNl2tXYXVHaN9wE+CNbE0yOe6GMI598YnJgv8bm\nO/wIPTWGQ3WsRDzIKlgbzm2G9ek4dgT22tNwt4XAVktTyGbnTZAR8kWrqHfycUDz\nuYmhMgnTv7k98tD+pRaKcJIzuU0ofD6LmbBVQDl6ymPVxTWEdCbk6mQLZAncdjmZ\nh1Ol2IeqYkrAqEY6ofPme57mforaShi4nLR+4nmnMBpfgtddv8jr2GACQG+s4Jid\nel3QVSmvEkwBx0JEnNuaB6cG7Ppq6FCRAbjLDSmEnu9cWim5EMu4BzB9rQYlTEPA\nCdJ3noQpVW6gc3VohB/ydBbNO5T0RhWe2caH4Bw5NXVYX2R01gg01jne65LiaMLA\nWu+tQtQDu1WKEqqWOZ1c7xP5CEEq6EOXiN6lK6Sioz7ZHzXdiNDlBgxSgX69mn0G\n2peZ+rffgDXYdYje1UfjsQOIzxGvNRiWnqQprIVWfx9Jc6YtILHdxuwRxovvkc7K\ndR7IHe46aEWw8sVIM7agwGJTv+bUgUDtmpRBK2o3RmI/8ZxL0GqCJeM615JcbM1A\nDACpxa+opaZ0CDjvM5dtzMPBKeodlShfv9B9y+bCgzav/R7IN/Ei42DeuNCjU+UQ\n5NkCAwEAAaOCAk0wggJJMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggrBgEF\nBQcDATAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQ4MRr1M/WTJEHSk3W/vyPhk/Hl\nMjAfBgNVHSMEGDAWgBTnq58PLDOgU9NeT3jIsoQOO9aSMzAzBggrBgEFBQcBAQQn\nMCUwIwYIKwYBBQUHMAKGF2h0dHA6Ly9yMTMuaS5sZW5jci5vcmcvMEkGA1UdEQRC\nMECCHyouYWN0aW9ucy5naXRodWJ1c2VyY29udGVudC5jb22CHWFjdGlvbnMuZ2l0\naHVidXNlcmNvbnRlbnQuY29tMBMGA1UdIAQMMAowCAYGZ4EMAQIBMC4GA1UdHwQn\nMCUwI6AhoB+GHWh0dHA6Ly9yMTMuYy5sZW5jci5vcmcvMTguY3JsMIIBDQYKKwYB\nBAHWeQIEAgSB/gSB+wD5AHYAlE5Dh/rswe+B8xkkJqgYZQHH0184AgE/cmd9VTcu\nGdgAAAGeHORx4AAABAMARzBFAiEAhAtF0/9wBzWXX4Tl8GP0AdGZfTiYhrR1vA6w\nXV8+EdcCID87W+6dxroP64PJxkQp96+l3BrIo2rFfX8X3cm2XZ3+AH8AqCbL4wrG\nNRJGUz/gZfFPGdluGQgTxB3ZbXkAsxI8VScAAAGeHOR0AQAIAAAFAAqaWuYEAwBI\nMEYCIQC1f9Ogr+vTiifekFJuoReNuJvF9EsVbpobwcTCUvySzAIhANeSFg7JdWZe\noiVeq9RHBJM+zm0OG+Fbcpo1oQ5cPu3jMA0GCSqGSIb3DQEBCwUAA4IBAQAuSwAe\nP99y2YQyMVQz5nImt+bRuTnu8Kd9MItxCzRHldegRXSUS4venORH7zU8SOachc2h\ntBvK5+JRlRziVPk3mGPT9O8aE+QH2mBGHY5AQBJ4Voe77KXk9d+fCrWROpiXr6H5\nXKPUeQmhPiP/ktJOU0aznVAA+zI+JerKWI1HnU0c9ZOZ/CpaleEAWix1vpLvTHO1\nWLHdP1PV8hrg03vsILsohAZlNRM1FZ0t4LYGgpoVOUrUBD8WcDie1NMyse18PO42\n5YCRm4ZQJ4nQu8UGcxnfm+8ci4YeRVwB/G4d4DoyBNyTM6RxtjHLWJ4y+49BI2Kn\nA2mk/d6P9lEj8fCA\n-----END CERTIFICATE-----\n",
+                "is_ca": false,
+                "issuer": "CN=R13,O=Let's Encrypt,C=US",
+                "max_path_length": -1,
+                "not_after": "2026-08-10T14:54:42Z",
+                "not_before": "2026-05-12T14:54:43Z",
+                "public_key_algorithm": "RSA",
+                "serial_number": "547668665948141900064672203667955784653713",
+                "sha1_fingerprint": "9514f4ed3c841c96c43def0f0acbf177405ded12",
+                "signature_algorithm": "SHA256-RSA",
+                "subject": "CN=*.actions.githubusercontent.com",
+                "version": 3
+              }
+            ],
+            "content": null,
+            "id": "21cc813b647d562789be0cf4f55cd08bc8852f4e",
+            "url": "https://token.actions.githubusercontent.com",
+            "verify_chain": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "module": "module.cicd_infra",
+      "mode": "managed",
+      "type": "aws_iam_openid_connect_provider",
+      "name": "github",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::116101833976:oidc-provider/token.actions.githubusercontent.com",
+            "client_id_list": [
+              "sts.amazonaws.com"
+            ],
+            "id": "arn:aws:iam::116101833976:oidc-provider/token.actions.githubusercontent.com",
+            "tags": {
+              "Environment": "shared",
+              "Name": "github-oidc-provider",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared",
+              "Name": "github-oidc-provider",
+              "Project": "RHORIZON"
+            },
+            "thumbprint_list": [
+              "22ff89586561fc2d52f77491e9f1eff1b80be33e"
+            ],
+            "url": "token.actions.githubusercontent.com"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.cicd_infra.data.tls_certificate.github"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.cicd_infra",
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "github_actions_nonprod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::116101833976:policy/shared-github-actions-nonprod-policy",
+            "attachment_count": 1,
+            "description": "Autorise le role CI/CD nonprod a assumer des roles dans le compte Non-Prod",
+            "id": "arn:aws:iam::116101833976:policy/shared-github-actions-nonprod-policy",
+            "name": "shared-github-actions-nonprod-policy",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:iam::083127296598:role/*\",\"Sid\":\"AllowAssumeRoleNonProd\"},{\"Action\":[\"ecr:GetDownloadUrlForLayer\",\"ecr:BatchGetImage\",\"ecr:BatchCheckLayerAvailability\",\"ecr:GetAuthorizationToken\"],\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"AllowECRRead\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPARWCBVMT4FIYDDDOMW",
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.cicd_infra",
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "github_actions_prod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::116101833976:policy/shared-github-actions-prod-policy",
+            "attachment_count": 1,
+            "description": "Autorise le role CI/CD prod a administrer shared-services et assumer des roles dans le compte Prod",
+            "id": "arn:aws:iam::116101833976:policy/shared-github-actions-prod-policy",
+            "name": "shared-github-actions-prod-policy",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:iam::593402827099:role/*\",\"Sid\":\"AllowAssumeRoleProd\"},{\"Action\":[\"ecr:*\",\"s3:*\",\"kms:*\",\"route53:*\",\"acm:*\"],\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"AllowSharedResourceManagement\"},{\"Action\":[\"iam:Get*\",\"iam:List*\"],\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"AllowIAMReadOnly\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPARWCBVMT4IJGRCS2G5",
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.cicd_infra",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "github_actions_nonprod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::116101833976:role/shared-github-actions-nonprod-role",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringLike\":{\"token.actions.githubusercontent.com:sub\":\"repo:EnzoLPN/Rhorizon_Project:*\"}},\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"arn:aws:iam::116101833976:oidc-provider/token.actions.githubusercontent.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-05-23T17:34:18Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "shared-github-actions-nonprod-role",
+            "inline_policy": [],
+            "managed_policy_arns": [
+              "arn:aws:iam::116101833976:policy/shared-github-actions-nonprod-policy"
+            ],
+            "max_session_duration": 3600,
+            "name": "shared-github-actions-nonprod-role",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Environment": "shared",
+              "Name": "shared-github-actions-nonprod-role",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared",
+              "Name": "shared-github-actions-nonprod-role",
+              "Project": "RHORIZON"
+            },
+            "unique_id": "AROARWCBVMT4HFIM6FHGK"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.cicd_infra.aws_iam_openid_connect_provider.github",
+            "module.cicd_infra.data.tls_certificate.github"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.cicd_infra",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "github_actions_prod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::116101833976:role/shared-github-actions-prod-role",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringEquals\":{\"token.actions.githubusercontent.com:sub\":\"repo:EnzoLPN/Rhorizon_Project:ref:refs/heads/main\"}},\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"arn:aws:iam::116101833976:oidc-provider/token.actions.githubusercontent.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-05-23T17:34:18Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "shared-github-actions-prod-role",
+            "inline_policy": [],
+            "managed_policy_arns": [
+              "arn:aws:iam::116101833976:policy/shared-github-actions-prod-policy"
+            ],
+            "max_session_duration": 3600,
+            "name": "shared-github-actions-prod-role",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Environment": "shared",
+              "Name": "shared-github-actions-prod-role",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared",
+              "Name": "shared-github-actions-prod-role",
+              "Project": "RHORIZON"
+            },
+            "unique_id": "AROARWCBVMT4DQQC33AJV"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.cicd_infra.aws_iam_openid_connect_provider.github",
+            "module.cicd_infra.data.tls_certificate.github"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.cicd_infra",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "github_nonprod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "shared-github-actions-nonprod-role-20260523173419265800000001",
+            "policy_arn": "arn:aws:iam::116101833976:policy/shared-github-actions-nonprod-policy",
+            "role": "shared-github-actions-nonprod-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.cicd_infra.aws_iam_openid_connect_provider.github",
+            "module.cicd_infra.aws_iam_policy.github_actions_nonprod",
+            "module.cicd_infra.aws_iam_role.github_actions_nonprod",
+            "module.cicd_infra.data.tls_certificate.github"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.cicd_infra",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "github_prod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "shared-github-actions-prod-role-20260523173419306400000002",
+            "policy_arn": "arn:aws:iam::116101833976:policy/shared-github-actions-prod-policy",
+            "role": "shared-github-actions-prod-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.cicd_infra.aws_iam_openid_connect_provider.github",
+            "module.cicd_infra.aws_iam_policy.github_actions_prod",
+            "module.cicd_infra.aws_iam_role.github_actions_prod",
+            "module.cicd_infra.data.tls_certificate.github"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "data",
+      "type": "aws_caller_identity",
+      "name": "current",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "116101833976",
+            "arn": "arn:aws:sts::116101833976:assumed-role/AWSReservedSSO_AdministratorAccess_28f605fd1d359993/Enzo_Master",
+            "id": "116101833976",
+            "user_id": "AROARWCBVMT4GBVXKSR2F:Enzo_Master"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_kms_alias",
+      "name": "assets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:eu-west-1:116101833976:alias/rhorizon-assets-key",
+            "id": "alias/rhorizon-assets-key",
+            "name": "alias/rhorizon-assets-key",
+            "name_prefix": "",
+            "target_key_arn": "arn:aws:kms:eu-west-1:116101833976:key/331748f7-769c-42ab-a70d-ae596a7281b5",
+            "target_key_id": "331748f7-769c-42ab-a70d-ae596a7281b5"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.assets",
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_kms_alias",
+      "name": "backups",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:eu-west-1:116101833976:alias/rhorizon-backups-key",
+            "id": "alias/rhorizon-backups-key",
+            "name": "alias/rhorizon-backups-key",
+            "name_prefix": "",
+            "target_key_arn": "arn:aws:kms:eu-west-1:116101833976:key/9d57469e-1a50-4ebe-8d8e-a1ab4b499447",
+            "target_key_id": "9d57469e-1a50-4ebe-8d8e-a1ab4b499447"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.backups",
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_kms_alias",
+      "name": "logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:eu-west-1:116101833976:alias/rhorizon-logs-key",
+            "id": "alias/rhorizon-logs-key",
+            "name": "alias/rhorizon-logs-key",
+            "name_prefix": "",
+            "target_key_arn": "arn:aws:kms:eu-west-1:116101833976:key/5bf1157f-2d7e-4512-b370-70dc406dc8c8",
+            "target_key_id": "5bf1157f-2d7e-4512-b370-70dc406dc8c8"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.logs",
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_kms_key",
+      "name": "assets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:eu-west-1:116101833976:key/331748f7-769c-42ab-a70d-ae596a7281b5",
+            "bypass_policy_lockout_safety_check": false,
+            "custom_key_store_id": "",
+            "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+            "deletion_window_in_days": 7,
+            "description": "Cle de chiffrement pour les documents et assets applicatifs",
+            "enable_key_rotation": true,
+            "id": "331748f7-769c-42ab-a70d-ae596a7281b5",
+            "is_enabled": true,
+            "key_id": "331748f7-769c-42ab-a70d-ae596a7281b5",
+            "key_usage": "ENCRYPT_DECRYPT",
+            "multi_region": false,
+            "policy": "{\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::116101833976:root\"},\"Resource\":\"*\",\"Sid\":\"EnableIAMUserPermissions\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::083127296598:root\",\"arn:aws:iam::593402827099:root\"]},\"Resource\":\"*\",\"Sid\":\"AllowCrossAccountUsageAssets\"}],\"Version\":\"2012-10-17\"}",
+            "rotation_period_in_days": 365,
+            "tags": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-kms-assets",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-kms-assets",
+              "Project": "RHORIZON"
+            },
+            "timeouts": null,
+            "xks_key_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_kms_key",
+      "name": "backups",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:eu-west-1:116101833976:key/9d57469e-1a50-4ebe-8d8e-a1ab4b499447",
+            "bypass_policy_lockout_safety_check": false,
+            "custom_key_store_id": "",
+            "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+            "deletion_window_in_days": 7,
+            "description": "Cle de chiffrement pour les backups centralises",
+            "enable_key_rotation": true,
+            "id": "9d57469e-1a50-4ebe-8d8e-a1ab4b499447",
+            "is_enabled": true,
+            "key_id": "9d57469e-1a50-4ebe-8d8e-a1ab4b499447",
+            "key_usage": "ENCRYPT_DECRYPT",
+            "multi_region": false,
+            "policy": "{\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::116101833976:root\"},\"Resource\":\"*\",\"Sid\":\"EnableIAMUserPermissions\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::083127296598:root\",\"arn:aws:iam::593402827099:root\"]},\"Resource\":\"*\",\"Sid\":\"AllowCrossAccountUsageBackups\"}],\"Version\":\"2012-10-17\"}",
+            "rotation_period_in_days": 365,
+            "tags": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-kms-backups",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-kms-backups",
+              "Project": "RHORIZON"
+            },
+            "timeouts": null,
+            "xks_key_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_kms_key",
+      "name": "logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:eu-west-1:116101833976:key/5bf1157f-2d7e-4512-b370-70dc406dc8c8",
+            "bypass_policy_lockout_safety_check": false,
+            "custom_key_store_id": "",
+            "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+            "deletion_window_in_days": 7,
+            "description": "Cle de chiffrement pour les logs d'audit et CloudTrail centralises",
+            "enable_key_rotation": true,
+            "id": "5bf1157f-2d7e-4512-b370-70dc406dc8c8",
+            "is_enabled": true,
+            "key_id": "5bf1157f-2d7e-4512-b370-70dc406dc8c8",
+            "key_usage": "ENCRYPT_DECRYPT",
+            "multi_region": false,
+            "policy": "{\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::116101833976:root\"},\"Resource\":\"*\",\"Sid\":\"EnableIAMUserPermissions\"},{\"Action\":[\"kms:GenerateDataKey*\",\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"*\",\"Sid\":\"AllowCloudTrailUsage\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::083127296598:root\",\"arn:aws:iam::593402827099:root\"]},\"Resource\":\"*\",\"Sid\":\"AllowCrossAccountUsage\"}],\"Version\":\"2012-10-17\"}",
+            "rotation_period_in_days": 365,
+            "tags": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-kms-logs",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-kms-logs",
+              "Project": "RHORIZON"
+            },
+            "timeouts": null,
+            "xks_key_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "assets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::rhorizon-app-assets",
+            "bucket": "rhorizon-app-assets",
+            "bucket_domain_name": "rhorizon-app-assets.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "rhorizon-app-assets.s3.eu-west-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": true,
+            "grant": [
+              {
+                "id": "c9ee2285a805597fe2ef3ac4b6d5ccf439a1a08bafdd8a026c04def6411c25e9",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z1BKCTXD74EZPE",
+            "id": "rhorizon-app-assets",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "eu-west-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "",
+                        "sse_algorithm": "AES256"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-app-assets",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-app-assets",
+              "Project": "RHORIZON"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": false,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "backups",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::rhorizon-central-backups",
+            "bucket": "rhorizon-central-backups",
+            "bucket_domain_name": "rhorizon-central-backups.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "rhorizon-central-backups.s3.eu-west-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": true,
+            "grant": [
+              {
+                "id": "c9ee2285a805597fe2ef3ac4b6d5ccf439a1a08bafdd8a026c04def6411c25e9",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z1BKCTXD74EZPE",
+            "id": "rhorizon-central-backups",
+            "lifecycle_rule": [
+              {
+                "abort_incomplete_multipart_upload_days": 0,
+                "enabled": true,
+                "expiration": [],
+                "id": "backups-lifecycle",
+                "noncurrent_version_expiration": [],
+                "noncurrent_version_transition": [],
+                "prefix": "",
+                "tags": {},
+                "transition": [
+                  {
+                    "date": "",
+                    "days": 30,
+                    "storage_class": "STANDARD_IA"
+                  },
+                  {
+                    "date": "",
+                    "days": 90,
+                    "storage_class": "GLACIER"
+                  }
+                ]
+              }
+            ],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::rhorizon-central-backups\",\"arn:aws:s3:::rhorizon-central-backups/*\"],\"Sid\":\"EnforceSSLRequestsOnly\"},{\"Action\":[\"s3:PutObject\",\"s3:PutObjectAcl\",\"s3:GetObject\",\"s3:ListBucket\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::593402827099:root\",\"arn:aws:iam::083127296598:root\"]},\"Resource\":[\"arn:aws:s3:::rhorizon-central-backups\",\"arn:aws:s3:::rhorizon-central-backups/*\"],\"Sid\":\"AllowCrossAccountAccessBackups\"}],\"Version\":\"2012-10-17\"}",
+            "region": "eu-west-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "arn:aws:kms:eu-west-1:116101833976:key/9d57469e-1a50-4ebe-8d8e-a1ab4b499447",
+                        "sse_algorithm": "aws:kms"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-central-backups",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared-services",
+              "Name": "rhorizon-shared-services-central-backups",
+              "Project": "RHORIZON"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::rhorizon-monprojet-audit-logs",
+            "bucket": "rhorizon-monprojet-audit-logs",
+            "bucket_domain_name": "rhorizon-monprojet-audit-logs.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "rhorizon-monprojet-audit-logs.s3.eu-west-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "c9ee2285a805597fe2ef3ac4b6d5ccf439a1a08bafdd8a026c04def6411c25e9",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z1BKCTXD74EZPE",
+            "id": "rhorizon-monprojet-audit-logs",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [
+              {
+                "object_lock_enabled": "Enabled",
+                "rule": []
+              }
+            ],
+            "object_lock_enabled": true,
+            "policy": "",
+            "region": "eu-west-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "",
+                        "sse_algorithm": "AES256"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Environment": "shared-services",
+              "Name": "shared-services-audit-logs",
+              "Project": "RHZORION"
+            },
+            "tags_all": {
+              "Environment": "shared-services",
+              "Name": "shared-services-audit-logs",
+              "Project": "RHZORION"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_lifecycle_configuration",
+      "name": "backups",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "bucket": "rhorizon-central-backups",
+            "expected_bucket_owner": "",
+            "id": "rhorizon-central-backups",
+            "rule": [
+              {
+                "abort_incomplete_multipart_upload": [],
+                "expiration": [],
+                "filter": [
+                  {
+                    "and": [],
+                    "object_size_greater_than": null,
+                    "object_size_less_than": null,
+                    "prefix": "",
+                    "tag": []
+                  }
+                ],
+                "id": "backups-lifecycle",
+                "noncurrent_version_expiration": [],
+                "noncurrent_version_transition": [],
+                "prefix": "",
+                "status": "Enabled",
+                "transition": [
+                  {
+                    "date": null,
+                    "days": 30,
+                    "storage_class": "STANDARD_IA"
+                  },
+                  {
+                    "date": null,
+                    "days": 90,
+                    "storage_class": "GLACIER"
+                  }
+                ]
+              }
+            ],
+            "timeouts": null,
+            "transition_default_minimum_object_size": "all_storage_classes_128K"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "module.shared_core.aws_s3_bucket.backups"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_policy",
+      "name": "assets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "rhorizon-app-assets",
+            "id": "rhorizon-app-assets",
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::rhorizon-app-assets\",\"arn:aws:s3:::rhorizon-app-assets/*\"],\"Sid\":\"EnforceSSLRequestsOnly\"},{\"Action\":[\"s3:PutObject\",\"s3:PutObjectAcl\",\"s3:GetObject\",\"s3:ListBucket\",\"s3:DeleteObject\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::083127296598:root\",\"arn:aws:iam::593402827099:root\"]},\"Resource\":[\"arn:aws:s3:::rhorizon-app-assets\",\"arn:aws:s3:::rhorizon-app-assets/*\"],\"Sid\":\"AllowCrossAccountAccessAssets\"}],\"Version\":\"2012-10-17\"}"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_s3_bucket.assets"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_policy",
+      "name": "backups",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "rhorizon-central-backups",
+            "id": "rhorizon-central-backups",
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::rhorizon-central-backups\",\"arn:aws:s3:::rhorizon-central-backups/*\"],\"Sid\":\"EnforceSSLRequestsOnly\"},{\"Action\":[\"s3:PutObject\",\"s3:PutObjectAcl\",\"s3:GetObject\",\"s3:ListBucket\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::083127296598:root\",\"arn:aws:iam::593402827099:root\"]},\"Resource\":[\"arn:aws:s3:::rhorizon-central-backups\",\"arn:aws:s3:::rhorizon-central-backups/*\"],\"Sid\":\"AllowCrossAccountAccessBackups\"}],\"Version\":\"2012-10-17\"}"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_s3_bucket.backups"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "assets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "rhorizon-app-assets",
+            "id": "rhorizon-app-assets",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_s3_bucket.assets"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "backups",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "rhorizon-central-backups",
+            "id": "rhorizon-central-backups",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_s3_bucket.backups"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "assets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "rhorizon-app-assets",
+            "expected_bucket_owner": "",
+            "id": "rhorizon-app-assets",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:eu-west-1:116101833976:key/331748f7-769c-42ab-a70d-ae596a7281b5",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": null
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.assets",
+            "module.shared_core.aws_s3_bucket.assets",
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "backups",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "rhorizon-central-backups",
+            "expected_bucket_owner": "",
+            "id": "rhorizon-central-backups",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:eu-west-1:116101833976:key/9d57469e-1a50-4ebe-8d8e-a1ab4b499447",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.backups",
+            "module.shared_core.aws_s3_bucket.backups",
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "assets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "rhorizon-app-assets",
+            "expected_bucket_owner": "",
+            "id": "rhorizon-app-assets",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_s3_bucket.assets"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_core",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "backups",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "rhorizon-central-backups",
+            "expected_bucket_owner": "",
+            "id": "rhorizon-central-backups",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_s3_bucket.backups"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_ecr",
+      "mode": "managed",
+      "type": "aws_ecr_lifecycle_policy",
+      "name": "policy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": "rhorizon/backend",
+          "schema_version": 0,
+          "attributes": {
+            "id": "rhorizon/backend",
+            "policy": "{\"rules\":[{\"action\":{\"type\":\"expire\"},\"description\":\"Supprimer les images non taguees apres 7 jours\",\"rulePriority\":1,\"selection\":{\"countNumber\":7,\"countType\":\"sinceImagePushed\",\"countUnit\":\"days\",\"tagStatus\":\"untagged\"}},{\"action\":{\"type\":\"expire\"},\"description\":\"Conserver uniquement les 10 dernieres images\",\"rulePriority\":2,\"selection\":{\"countNumber\":10,\"countType\":\"imageCountMoreThan\",\"tagStatus\":\"any\"}}]}",
+            "registry_id": "116101833976",
+            "repository": "rhorizon/backend"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.assets",
+            "module.shared_core.data.aws_caller_identity.current",
+            "module.shared_ecr.aws_ecr_repository.repo"
+          ]
+        },
+        {
+          "index_key": "rhorizon/frontend",
+          "schema_version": 0,
+          "attributes": {
+            "id": "rhorizon/frontend",
+            "policy": "{\"rules\":[{\"action\":{\"type\":\"expire\"},\"description\":\"Supprimer les images non taguees apres 7 jours\",\"rulePriority\":1,\"selection\":{\"countNumber\":7,\"countType\":\"sinceImagePushed\",\"countUnit\":\"days\",\"tagStatus\":\"untagged\"}},{\"action\":{\"type\":\"expire\"},\"description\":\"Conserver uniquement les 10 dernieres images\",\"rulePriority\":2,\"selection\":{\"countNumber\":10,\"countType\":\"imageCountMoreThan\",\"tagStatus\":\"any\"}}]}",
+            "registry_id": "116101833976",
+            "repository": "rhorizon/frontend"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.assets",
+            "module.shared_core.data.aws_caller_identity.current",
+            "module.shared_ecr.aws_ecr_repository.repo"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_ecr",
+      "mode": "managed",
+      "type": "aws_ecr_repository",
+      "name": "repo",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": "rhorizon/backend",
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecr:eu-west-1:116101833976:repository/rhorizon/backend",
+            "encryption_configuration": [
+              {
+                "encryption_type": "KMS",
+                "kms_key": "arn:aws:kms:eu-west-1:116101833976:key/331748f7-769c-42ab-a70d-ae596a7281b5"
+              }
+            ],
+            "force_delete": true,
+            "id": "rhorizon/backend",
+            "image_scanning_configuration": [
+              {
+                "scan_on_push": true
+              }
+            ],
+            "image_tag_mutability": "IMMUTABLE",
+            "name": "rhorizon/backend",
+            "registry_id": "116101833976",
+            "repository_url": "116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhorizon/backend",
+            "tags": {
+              "Environment": "shared",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared",
+              "Project": "RHORIZON"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxMjAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.assets",
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        },
+        {
+          "index_key": "rhorizon/frontend",
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecr:eu-west-1:116101833976:repository/rhorizon/frontend",
+            "encryption_configuration": [
+              {
+                "encryption_type": "KMS",
+                "kms_key": "arn:aws:kms:eu-west-1:116101833976:key/331748f7-769c-42ab-a70d-ae596a7281b5"
+              }
+            ],
+            "force_delete": true,
+            "id": "rhorizon/frontend",
+            "image_scanning_configuration": [
+              {
+                "scan_on_push": true
+              }
+            ],
+            "image_tag_mutability": "IMMUTABLE",
+            "name": "rhorizon/frontend",
+            "registry_id": "116101833976",
+            "repository_url": "116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhorizon/frontend",
+            "tags": {
+              "Environment": "shared",
+              "Project": "RHORIZON"
+            },
+            "tags_all": {
+              "Environment": "shared",
+              "Project": "RHORIZON"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxMjAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.assets",
+            "module.shared_core.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.shared_ecr",
+      "mode": "managed",
+      "type": "aws_ecr_repository_policy",
+      "name": "cross_account_policy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": "rhorizon/backend",
+          "schema_version": 0,
+          "attributes": {
+            "id": "rhorizon/backend",
+            "policy": "{\"Statement\":[{\"Action\":[\"ecr:GetDownloadUrlForLayer\",\"ecr:BatchGetImage\",\"ecr:BatchCheckLayerAvailability\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::083127296598:root\",\"arn:aws:iam::593402827099:root\"]},\"Sid\":\"AllowCrossAccountPull\"}],\"Version\":\"2012-10-17\"}",
+            "registry_id": "116101833976",
+            "repository": "rhorizon/backend"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.assets",
+            "module.shared_core.data.aws_caller_identity.current",
+            "module.shared_ecr.aws_ecr_repository.repo"
+          ]
+        },
+        {
+          "index_key": "rhorizon/frontend",
+          "schema_version": 0,
+          "attributes": {
+            "id": "rhorizon/frontend",
+            "policy": "{\"Statement\":[{\"Action\":[\"ecr:GetDownloadUrlForLayer\",\"ecr:BatchGetImage\",\"ecr:BatchCheckLayerAvailability\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::083127296598:root\",\"arn:aws:iam::593402827099:root\"]},\"Sid\":\"AllowCrossAccountPull\"}],\"Version\":\"2012-10-17\"}",
+            "registry_id": "116101833976",
+            "repository": "rhorizon/frontend"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.shared_core.aws_kms_key.assets",
+            "module.shared_core.data.aws_caller_identity.current",
+            "module.shared_ecr.aws_ecr_repository.repo"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

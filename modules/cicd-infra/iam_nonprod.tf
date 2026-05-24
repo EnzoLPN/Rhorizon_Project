@@ -41,13 +41,17 @@ resource "aws_iam_policy" "github_actions_nonprod" {
         Resource = "arn:aws:iam::${var.nonprod_account_id}:role/*"
       },
       {
-        Sid      = "AllowECRRead"
+        Sid      = "AllowECRReadWrite"
         Effect   = "Allow"
         Action   = [
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage",
           "ecr:BatchCheckLayerAvailability",
-          "ecr:GetAuthorizationToken"
+          "ecr:GetAuthorizationToken",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
         ]
         Resource = "*"
       }

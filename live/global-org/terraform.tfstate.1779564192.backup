@@ -1,0 +1,392 @@
+{
+  "version": 4,
+  "terraform_version": "1.15.3",
+  "serial": 48,
+  "lineage": "7b21f736-e547-ab33-9955-2e14a1e9b355",
+  "outputs": {},
+  "resources": [
+    {
+      "module": "module.accounts_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_organization",
+      "name": "org",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "accounts": [
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/593402827099",
+                "email": "enzo.loppin+prod@gmail.com",
+                "id": "593402827099",
+                "name": "prod",
+                "status": "ACTIVE"
+              },
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/083127296598",
+                "email": "enzo.loppin+nonprod@gmail.com",
+                "id": "083127296598",
+                "name": "nonprod",
+                "status": "ACTIVE"
+              },
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/116101833976",
+                "email": "enzo.loppin+shared@gmail.com",
+                "id": "116101833976",
+                "name": "shared-services",
+                "status": "ACTIVE"
+              },
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/628711465908",
+                "email": "enzo.loppin+1@gmail.com",
+                "id": "628711465908",
+                "name": "enzo_Master",
+                "status": "SUSPENDED"
+              },
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/343218196208",
+                "email": "enzo.loppin@gmail.com",
+                "id": "343218196208",
+                "name": "enzo.lpn",
+                "status": "ACTIVE"
+              }
+            ],
+            "arn": "arn:aws:organizations::343218196208:organization/o-faytjxsk3f",
+            "aws_service_access_principals": [
+              "cloudtrail.amazonaws.com",
+              "ram.amazonaws.com",
+              "sso.amazonaws.com"
+            ],
+            "enabled_policy_types": [
+              "SERVICE_CONTROL_POLICY"
+            ],
+            "feature_set": "ALL",
+            "id": "o-faytjxsk3f",
+            "master_account_arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/343218196208",
+            "master_account_email": "enzo.loppin@gmail.com",
+            "master_account_id": "343218196208",
+            "master_account_name": "enzo.lpn",
+            "non_master_accounts": [
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/593402827099",
+                "email": "enzo.loppin+prod@gmail.com",
+                "id": "593402827099",
+                "name": "prod",
+                "status": "ACTIVE"
+              },
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/083127296598",
+                "email": "enzo.loppin+nonprod@gmail.com",
+                "id": "083127296598",
+                "name": "nonprod",
+                "status": "ACTIVE"
+              },
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/116101833976",
+                "email": "enzo.loppin+shared@gmail.com",
+                "id": "116101833976",
+                "name": "shared-services",
+                "status": "ACTIVE"
+              },
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/628711465908",
+                "email": "enzo.loppin+1@gmail.com",
+                "id": "628711465908",
+                "name": "enzo_Master",
+                "status": "SUSPENDED"
+              }
+            ],
+            "roots": [
+              {
+                "arn": "arn:aws:organizations::343218196208:root/o-faytjxsk3f/r-1l5q",
+                "id": "r-1l5q",
+                "name": "Root",
+                "policy_types": [
+                  {
+                    "status": "ENABLED",
+                    "type": "SERVICE_CONTROL_POLICY"
+                  }
+                ]
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.accounts_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_organizational_unit",
+      "name": "nonprod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "accounts": [
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/083127296598",
+                "email": "enzo.loppin+nonprod@gmail.com",
+                "id": "083127296598",
+                "name": "nonprod"
+              }
+            ],
+            "arn": "arn:aws:organizations::343218196208:ou/o-faytjxsk3f/ou-1l5q-0nbfqolx",
+            "id": "ou-1l5q-0nbfqolx",
+            "name": "nonprod",
+            "parent_id": "r-1l5q",
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.accounts_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_organizational_unit",
+      "name": "prod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "accounts": [
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/593402827099",
+                "email": "enzo.loppin+prod@gmail.com",
+                "id": "593402827099",
+                "name": "prod"
+              }
+            ],
+            "arn": "arn:aws:organizations::343218196208:ou/o-faytjxsk3f/ou-1l5q-eciahznj",
+            "id": "ou-1l5q-eciahznj",
+            "name": "prod",
+            "parent_id": "r-1l5q",
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.accounts_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_organizational_unit",
+      "name": "shared",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "accounts": [
+              {
+                "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/116101833976",
+                "email": "enzo.loppin+shared@gmail.com",
+                "id": "116101833976",
+                "name": "shared-services"
+              }
+            ],
+            "arn": "arn:aws:organizations::343218196208:ou/o-faytjxsk3f/ou-1l5q-hswqoz02",
+            "id": "ou-1l5q-hswqoz02",
+            "name": "shared",
+            "parent_id": "r-1l5q",
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.accounts_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_policy",
+      "name": "deny_public_s3",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:organizations::343218196208:policy/o-faytjxsk3f/service_control_policy/p-0ahwbizy",
+            "content": "{\"Statement\":[{\"Action\":[\"s3:DeleteBucketPublicAccessBlock\",\"s3:DeleteAccountPublicAccessBlock\"],\"Effect\":\"Deny\",\"Resource\":\"*\",\"Sid\":\"DenyS3PublicAccessBlockDeletion\"},{\"Action\":[\"s3:PutBucketPublicAccessBlock\",\"s3:PutAccountPublicAccessBlock\"],\"Condition\":{\"Bool\":{\"s3:PublicAccessBlockConfiguration/BlockPublicAcls\":\"false\"}},\"Effect\":\"Deny\",\"Resource\":\"*\",\"Sid\":\"DenyS3BlockPublicAclsFalse\"},{\"Action\":[\"s3:PutBucketPublicAccessBlock\",\"s3:PutAccountPublicAccessBlock\"],\"Condition\":{\"Bool\":{\"s3:PublicAccessBlockConfiguration/IgnorePublicAcls\":\"false\"}},\"Effect\":\"Deny\",\"Resource\":\"*\",\"Sid\":\"DenyS3IgnorePublicAclsFalse\"},{\"Action\":[\"s3:PutBucketPublicAccessBlock\",\"s3:PutAccountPublicAccessBlock\"],\"Condition\":{\"Bool\":{\"s3:PublicAccessBlockConfiguration/BlockPublicPolicy\":\"false\"}},\"Effect\":\"Deny\",\"Resource\":\"*\",\"Sid\":\"DenyS3BlockPublicPolicyFalse\"},{\"Action\":[\"s3:PutBucketPublicAccessBlock\",\"s3:PutAccountPublicAccessBlock\"],\"Condition\":{\"Bool\":{\"s3:PublicAccessBlockConfiguration/RestrictPublicBuckets\":\"false\"}},\"Effect\":\"Deny\",\"Resource\":\"*\",\"Sid\":\"DenyS3RestrictPublicBucketsFalse\"},{\"Action\":[\"s3:PutBucketAcl\",\"s3:PutObjectAcl\"],\"Condition\":{\"StringEquals\":{\"s3:x-amz-grant-public-read\":\"true\",\"s3:x-amz-grant-public-write\":\"true\"}},\"Effect\":\"Deny\",\"Resource\":\"*\",\"Sid\":\"DenyPublicBucketACLs\"}],\"Version\":\"2012-10-17\"}",
+            "description": "Empeche la desactivation du Block Public Access et l'usage d'ACLs publiques sur S3",
+            "id": "p-0ahwbizy",
+            "name": "deny-public-s3",
+            "skip_destroy": null,
+            "tags": null,
+            "tags_all": {},
+            "type": "SERVICE_CONTROL_POLICY"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.accounts_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_policy",
+      "name": "eu_only",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:organizations::343218196208:policy/o-faytjxsk3f/service_control_policy/p-kb2p08yf",
+            "content": "{\"Statement\":[{\"Condition\":{\"StringNotEquals\":{\"aws:RequestedRegion\":[\"eu-west-1\",\"eu-central-1\",\"eu-west-2\"]}},\"Effect\":\"Deny\",\"NotAction\":[\"iam:*\",\"organizations:*\",\"route53:*\",\"budgets:*\",\"support:*\",\"sso:*\",\"identitystore:*\",\"cloudfront:*\",\"waf:*\",\"wafv2:*\",\"acm:*\",\"globalaccelerator:*\"],\"Resource\":\"*\",\"Sid\":\"DenyAllOutsideEU\"}],\"Version\":\"2012-10-17\"}",
+            "description": "Interdit le deploiement de ressources en dehors des regions europeennes autorisees",
+            "id": "p-kb2p08yf",
+            "name": "eu-only-regions",
+            "skip_destroy": null,
+            "tags": null,
+            "tags_all": {},
+            "type": "SERVICE_CONTROL_POLICY"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.accounts_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_policy",
+      "name": "mandatory_trail",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:organizations::343218196208:policy/o-faytjxsk3f/service_control_policy/p-v5192pnf",
+            "content": "{\"Statement\":[{\"Action\":[\"cloudtrail:DeleteTrail\",\"cloudtrail:StopLogging\",\"cloudtrail:UpdateTrail\",\"cloudtrail:PutEventSelectors\",\"cloudtrail:RemoveTags\",\"cloudtrail:AddTags\"],\"Effect\":\"Deny\",\"Resource\":\"*\",\"Sid\":\"DenyCloudTrailModification\"}],\"Version\":\"2012-10-17\"}",
+            "description": "Empeche l'arret, la modification ou la suppression de CloudTrail",
+            "id": "p-v5192pnf",
+            "name": "mandatory-trail",
+            "skip_destroy": null,
+            "tags": null,
+            "tags_all": {},
+            "type": "SERVICE_CONTROL_POLICY"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.org_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_account",
+      "name": "nonprod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/083127296598",
+            "close_on_deletion": false,
+            "create_govcloud": false,
+            "email": "enzo.loppin+nonprod@gmail.com",
+            "govcloud_id": "",
+            "iam_user_access_to_billing": null,
+            "id": "083127296598",
+            "joined_method": "CREATED",
+            "joined_timestamp": "2026-05-22T09:31:33Z",
+            "name": "nonprod",
+            "parent_id": "ou-1l5q-0nbfqolx",
+            "role_name": "OrganizationAccountAccessRole",
+            "status": "ACTIVE",
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.org_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_account",
+      "name": "prod",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/593402827099",
+            "close_on_deletion": false,
+            "create_govcloud": false,
+            "email": "enzo.loppin+prod@gmail.com",
+            "govcloud_id": "",
+            "iam_user_access_to_billing": null,
+            "id": "593402827099",
+            "joined_method": "CREATED",
+            "joined_timestamp": "2026-05-22T09:31:33Z",
+            "name": "prod",
+            "parent_id": "ou-1l5q-eciahznj",
+            "role_name": "OrganizationAccountAccessRole",
+            "status": "ACTIVE",
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.org_baseline",
+      "mode": "managed",
+      "type": "aws_organizations_account",
+      "name": "shared_services",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:organizations::343218196208:account/o-faytjxsk3f/116101833976",
+            "close_on_deletion": false,
+            "create_govcloud": false,
+            "email": "enzo.loppin+shared@gmail.com",
+            "govcloud_id": "",
+            "iam_user_access_to_billing": null,
+            "id": "116101833976",
+            "joined_method": "CREATED",
+            "joined_timestamp": "2026-05-22T09:31:32Z",
+            "name": "shared-services",
+            "parent_id": "ou-1l5q-hswqoz02",
+            "role_name": "OrganizationAccountAccessRole",
+            "status": "ACTIVE",
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19"
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
