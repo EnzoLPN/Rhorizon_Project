@@ -18,12 +18,11 @@ grafana:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      # alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/healthcheck-path: /api/health
       alb.ingress.kubernetes.io/certificate-arn: "${ACM_CERTIFICATE_ARN}"
       alb.ingress.kubernetes.io/waf-acl-arn: "${WAF_WEB_ACL_ARN}"
-    hosts:
-      - "${GRAFANA_DOMAIN_NAME}"
+    hosts: [] # Suppression du host pour autoriser l'accès direct via DNS AWS
     path: /
 
   persistence:
