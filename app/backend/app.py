@@ -111,7 +111,8 @@ def get_db_connection():
         user=DB_USER,
         password=password,
         database=DB_NAME,
-        connect_timeout=3
+        connect_timeout=5,
+        sslmode='require'
     )
     return conn
 
