@@ -38,7 +38,7 @@ resource "aws_iam_policy" "github_actions_nonprod" {
         Sid      = "AllowAssumeRoleNonProd"
         Effect   = "Allow"
         Action   = "sts:AssumeRole"
-        Resource = "arn:aws:iam::${var.nonprod_account_id}:role/*"
+        Resource = ["arn:aws:iam::${var.nonprod_account_id}:role/nonprod-eks-deploy-role", "arn:aws:iam::${var.nonprod_account_id}:role/*"]
       },
       {
         Sid      = "AllowECRReadWrite"
