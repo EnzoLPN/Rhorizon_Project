@@ -22,8 +22,7 @@ grafana:
       alb.ingress.kubernetes.io/healthcheck-path: /api/health
       alb.ingress.kubernetes.io/certificate-arn: "${ACM_CERTIFICATE_ARN}"
       alb.ingress.kubernetes.io/waf-acl-arn: "${WAF_WEB_ACL_ARN}"
-    hosts:
-      - "${GRAFANA_DOMAIN_NAME}" # Domaine rétabli
+    hosts: [] # Pas de 'hosts' pour autoriser l'accès direct via DNS AWS
     path: /
 
   persistence:
