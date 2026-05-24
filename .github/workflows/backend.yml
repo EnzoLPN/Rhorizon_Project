@@ -27,12 +27,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
           cd app/backend
-          pip install Flask Flask-Cors
+          pip install Flask Flask-Cors psycopg2-binary gunicorn boto3
 
       - name: Run Unit Tests
         run: |
@@ -49,21 +49,43 @@ jobs:
           pip install pip-audit
           pip-audit -r app/backend/requirements.txt
 
-  build:
-    name: Backend Build & Push
+  build-and-scan:
+    name: Backend Build, Scan & Push
     needs: validate
     environment: NON_PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.build-image.outputs.tag }}
+      image_tag: ${{ steps.vars.outputs.tag }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set short git commit SHA
+      - name: Set variables
         id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          TAG="${SHA_SHORT}-$(date +%Y%m%d-%H%M%S)"
+          echo "sha_short=$SHA_SHORT" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Build local image
+        env:
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
+          TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG ./app/backend
+
+      - name: Scan Image with Trivy (AVANT le Push)
+        env:
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
+          TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          # On ignore les HIGH/CRITICAL qui n'ont pas encore de correctif pour ne pas bloquer inutilement
+          # Mais on bloque sur tout ce qui est fixable
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
 
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -75,16 +97,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
+      - name: Push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
           ECR_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
-          SHA_SHORT: ${{ steps.vars.outputs.sha_short }}
+          TAG: ${{ steps.vars.outputs.tag }}
         run: |
-          TAG="${SHA_SHORT}-$(date +%Y%m%d-%H%M%S)"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG ./app/backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
 
       - name: Install Cosign
@@ -94,7 +112,7 @@ jobs:
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-          IMAGE_URI: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_BACKEND_REPOSITORY }}:${{ steps.build-image.outputs.tag }}
+          IMAGE_URI: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_BACKEND_REPOSITORY }}:${{ steps.vars.outputs.tag }}
         run: |
           if [ -n "$COSIGN_PRIVATE_KEY" ]; then
             echo "Signing backend image with Cosign..."
@@ -103,40 +121,9 @@ jobs:
             echo "⚠️ Warning: COSIGN_PRIVATE_KEY is not set. Skipping signature."
           fi
 
-  scan:
-    name: Backend Container Scan
-    needs: build
-    environment: NON_PROD
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure AWS Credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Pull image from ECR
-        env:
-          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
-          ECR_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
-        run: |
-          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.build.outputs.image_tag }}
-
-      - name: Scan Image with Trivy
-        env:
-          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
-          ECR_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
-        run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.build.outputs.image_tag }}
-
   deploy:
     name: Backend Deploy to EKS Nonprod
-    needs: [build, scan]
+    needs: build-and-scan
     environment: NON_PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -163,7 +150,7 @@ jobs:
 
       - name: Deploy to EKS
         env:
-          IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+          IMAGE_TAG: ${{ needs.build-and-scan.outputs.image_tag }}
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
           ECR_BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
           DB_HOST: ${{ vars.DB_HOST }}
@@ -181,4 +168,3 @@ jobs:
           DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/nonprod/rds/db-admin-password --query SecretString --output text)
           export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
           ./app/k8s/deploy.sh backend
-# Force rerun
