@@ -169,3 +169,4 @@ jobs:
           export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
           ./app/k8s/deploy.sh backend
 # Trigger run
+# Final validation run
