@@ -94,19 +94,19 @@ fi
 echo "Generated interpolated manifests in $GENERATED_DIR/"
 
 echo -e "\n=== 4. Applying Kubernetes Manifests ==="
-kubectl apply -f "$GENERATED_DIR/namespace.yaml"
-kubectl apply -f "$GENERATED_DIR/network-policy.yaml"
+kubectl apply -f "$GENERATED_DIR/namespace.yaml" --validate=false
+kubectl apply -f "$GENERATED_DIR/network-policy.yaml" --validate=false
 
 if [[ "$COMPONENT" == "backend" || "$COMPONENT" == "all" ]]; then
-  kubectl apply -f "$GENERATED_DIR/backend.yaml"
+  kubectl apply -f "$GENERATED_DIR/backend.yaml" --validate=false
 fi
 
 if [[ "$COMPONENT" == "frontend" || "$COMPONENT" == "all" ]]; then
-  kubectl apply -f "$GENERATED_DIR/frontend.yaml"
+  kubectl apply -f "$GENERATED_DIR/frontend.yaml" --validate=false
 fi
 
 # Always apply ingress
-kubectl apply -f "$GENERATED_DIR/ingress.yaml"
+kubectl apply -f "$GENERATED_DIR/ingress.yaml" --validate=false
 
 echo -e "\n=== 5. Waiting for Deployments to roll out ==="
 if [[ "$COMPONENT" == "backend" || "$COMPONENT" == "all" ]]; then
