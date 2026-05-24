@@ -11,14 +11,13 @@ on:
       - '.github/workflows/frontend.yml'
   workflow_dispatch:
 
-
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  validate:
-    name: Frontend Validation
+  static-analysis:
+    name: 🛡️ Static Analysis (SAST/SCA)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -29,8 +28,8 @@ jobs:
           docker run --rm -v ${{ github.workspace }}:/apps aquasec/trivy:latest fs --severity HIGH,CRITICAL --exit-code 1 /apps/app/frontend
 
   build-and-scan:
-    name: Frontend Build, Scan & Push
-    needs: validate
+    name: 🏗️ Build, Scan & Push
+    needs: static-analysis
     environment: NON_PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -56,13 +55,12 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG ./app/frontend
 
-      - name: Scan Image with Trivy (AVANT le Push)
+      - name: Container Image Scan (Trivy)
         env:
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
           ECR_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
           TAG: ${{ steps.vars.outputs.tag }}
         run: |
-          # On bloque sur tout ce qui est fixable
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
 
       - name: Configure AWS Credentials (OIDC)
@@ -75,7 +73,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Push image to Amazon ECR
+      - name: Push Image to ECR
         env:
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
           ECR_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
@@ -86,7 +84,7 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.5.0
 
-      - name: Sign Docker Image with Cosign
+      - name: Sign Docker Image (Cosign)
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
@@ -100,7 +98,7 @@ jobs:
           fi
 
   deploy:
-    name: Frontend Deploy to EKS Nonprod
+    name: 🚀 Deploy to EKS
     needs: build-and-scan
     environment: NON_PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -115,7 +113,7 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Assume Cross-Account Nonprod Role
+      - name: Assume Cross-Account Deploy Role
         run: |
           ASSUME_OUTPUT=$(aws sts assume-role --role-arn "${{ vars.AWS_NONPROD_ROLE_ARN }}" --role-session-name "EKSFrontendDeploy" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
           echo "AWS_ACCESS_KEY_ID=$(echo "$ASSUME_OUTPUT" | awk '{print $1}')" >> $GITHUB_ENV
@@ -126,7 +124,7 @@ jobs:
         run: |
           aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
 
-      - name: Deploy to EKS
+      - name: Deploy Kubernetes Manifests
         env:
           IMAGE_TAG: ${{ needs.build-and-scan.outputs.image_tag }}
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
@@ -138,5 +136,4 @@ jobs:
           PROJECT_NAME: "rhorizon"
         run: |
           ./app/k8s/deploy.sh frontend
-# Force frontend deploy
-# Final Prod-Ready Frontend Run
+# Standardization run
