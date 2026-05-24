@@ -181,3 +181,4 @@ jobs:
           DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/nonprod/rds/db-admin-password --query SecretString --output text)
           export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
           ./app/k8s/deploy.sh backend
+# Force rerun
