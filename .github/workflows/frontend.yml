@@ -138,3 +138,4 @@ jobs:
           PROJECT_NAME: "rhorizon"
         run: |
           ./app/k8s/deploy.sh frontend
+# Force frontend deploy
