@@ -4,12 +4,6 @@ variable "environment" {
   default     = "shared-services"
 }
 
-variable "bucket_prefix" {
-  type        = string
-  description = "Prefixe unique pour nommer les buckets S3 (pour eviter les collisions globales)"
-  default     = "rhorizon"
-}
-
 variable "enable_object_lock" {
   type        = bool
   description = "Activer ou non S3 Object Lock pour le bucket de logs"
@@ -44,4 +38,10 @@ variable "prod_account_id" {
   type        = string
   description = "ID du compte AWS Prod pour accorder les acces cross-account"
   default     = ""
+}
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
 }

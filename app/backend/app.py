@@ -13,8 +13,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(mes
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-# Enable CORS for all routes (important for development and split frontend/backend architecture)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+# Enable CORS for all routes (configured via environment variable in production)
+allowed_origins = os.environ.get("ALLOWED_CORS_ORIGINS", "*").split(",")
+CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
 
 # DB Configuration from environment variables
 DB_HOST = os.environ.get("DB_HOST", "localhost")
@@ -87,12 +88,28 @@ def check_s3_health():
     return s3_status, s3_error
 
 def get_db_connection():
-    """Establishes a connection to the PostgreSQL database."""
+    """Establishes a connection to the PostgreSQL database (Supports IAM Auth)."""
+    password = DB_PASSWORD
+    
+    # Use IAM Authentication if enabled via environment variable
+    if os.environ.get("USE_IAM_AUTH") == "true":
+        try:
+            logger.info(f"Generating IAM auth token for RDS host {DB_HOST}...")
+            rds_client = boto3.client('rds', region_name=AWS_REGION)
+            password = rds_client.generate_db_auth_token(
+                DBHostname=DB_HOST,
+                Port=int(DB_PORT),
+                DBUsername=DB_USER,
+                Region=AWS_REGION
+            )
+        except Exception as e:
+            logger.error(f"Failed to generate IAM auth token: {e}. Falling back to static password.")
+
     conn = psycopg2.connect(
         host=DB_HOST,
         port=DB_PORT,
         user=DB_USER,
-        password=DB_PASSWORD,
+        password=password,
         database=DB_NAME,
         connect_timeout=3
     )

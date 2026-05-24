@@ -38,32 +38,32 @@ aws ecr get-login-password --region "$AWS_REGION" $PROFILE_FLAG | \
     docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
 echo -e "\n=== 2. Building Backend Image ==="
-docker build -t "$ECR_REGISTRY/rhzorion/backend:$IMAGE_TAG" "$SCRIPT_DIR/backend"
+docker build -t "$ECR_REGISTRY/rhorizon/backend:$IMAGE_TAG" "$SCRIPT_DIR/backend"
 
 echo -e "\n=== 3. Building Frontend Image ==="
-docker build -t "$ECR_REGISTRY/rhzorion/frontend:$IMAGE_TAG" "$SCRIPT_DIR/frontend"
+docker build -t "$ECR_REGISTRY/rhorizon/frontend:$IMAGE_TAG" "$SCRIPT_DIR/frontend"
 
 # If a custom tag was passed (i.e. not 'latest'), tag them as 'latest' too for convenience
 if [ "$IMAGE_TAG" != "latest" ]; then
     echo -e "\n=== Tagging images as 'latest' for convenience ==="
-    docker tag "$ECR_REGISTRY/rhzorion/backend:$IMAGE_TAG" "$ECR_REGISTRY/rhzorion/backend:latest"
-    docker tag "$ECR_REGISTRY/rhzorion/frontend:$IMAGE_TAG" "$ECR_REGISTRY/rhzorion/frontend:latest"
+    docker tag "$ECR_REGISTRY/rhorizon/backend:$IMAGE_TAG" "$ECR_REGISTRY/rhorizon/backend:latest"
+    docker tag "$ECR_REGISTRY/rhorizon/frontend:$IMAGE_TAG" "$ECR_REGISTRY/rhorizon/frontend:latest"
 fi
 
 echo -e "\n=== 4. Pushing Backend Image to ECR ==="
-docker push "$ECR_REGISTRY/rhzorion/backend:$IMAGE_TAG"
+docker push "$ECR_REGISTRY/rhorizon/backend:$IMAGE_TAG"
 if [ "$IMAGE_TAG" != "latest" ]; then
-    docker push "$ECR_REGISTRY/rhzorion/backend:latest"
+    docker push "$ECR_REGISTRY/rhorizon/backend:latest"
 fi
 
 echo -e "\n=== 5. Pushing Frontend Image to ECR ==="
-docker push "$ECR_REGISTRY/rhzorion/frontend:$IMAGE_TAG"
+docker push "$ECR_REGISTRY/rhorizon/frontend:$IMAGE_TAG"
 if [ "$IMAGE_TAG" != "latest" ]; then
-    docker push "$ECR_REGISTRY/rhzorion/frontend:latest"
+    docker push "$ECR_REGISTRY/rhorizon/frontend:latest"
 fi
 
 echo -e "\n🚀 === BUILD AND PUSH SUCCESSFUL ==="
-echo "Images pushed to ECR: $ECR_REGISTRY/rhzorion/[backend|frontend]:$IMAGE_TAG"
+echo "Images pushed to ECR: $ECR_REGISTRY/rhorizon/[backend|frontend]:$IMAGE_TAG"
 if [ "$IMAGE_TAG" != "latest" ]; then
     echo "Images also pushed with 'latest' tag."
 fi

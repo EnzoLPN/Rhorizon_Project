@@ -22,19 +22,27 @@ variable "prod_account_id" {
   default     = ""
 }
 
-variable "bucket_prefix" {
+variable "github_organization" {
   type        = string
-  description = "Prefixe unique pour les buckets S3"
+  description = "Nom de l organisation ou utilisateur GitHub"
+  default     = "EnzoLPN"
 }
 
-variable "gitlab_organization" {
+variable "github_project" {
   type        = string
-  description = "Nom de l organisation ou utilisateur GitLab"
-  default     = "eloppinantimi"
+  description = "Nom du depot de code GitHub"
+  default     = "Rhorizon_Project"
 }
 
-variable "gitlab_project" {
+
+variable "project_name" {
   type        = string
-  description = "Nom du depot de code GitLab"
-  default     = "infrastructure"
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}
+
+variable "enable_object_lock" {
+  type        = bool
+  description = "Activer ou non l'Object Lock sur les buckets S3"
+  default     = true
 }

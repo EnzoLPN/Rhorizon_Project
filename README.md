@@ -1,250 +1,432 @@
-# Guide de Test et Déploiement IaC Terraform - RHZORION (ASD)
+# terraform-docs
 
-Ce dépôt contient le code d'infrastructure (Infrastructure as Code) pour la plateforme SaaS **RHZORION** sur AWS, structuré en modules réutilisables et environnements distincts.
+[![Build Status](https://github.com/terraform-docs/terraform-docs/workflows/ci/badge.svg)](https://github.com/terraform-docs/terraform-docs/actions) [![GoDoc](https://pkg.go.dev/badge/github.com/terraform-docs/terraform-docs)](https://pkg.go.dev/github.com/terraform-docs/terraform-docs) [![Go Report Card](https://goreportcard.com/badge/github.com/terraform-docs/terraform-docs)](https://goreportcard.com/report/github.com/terraform-docs/terraform-docs) [![Codecov Report](https://codecov.io/gh/terraform-docs/terraform-docs/branch/master/graph/badge.svg)](https://codecov.io/gh/terraform-docs/terraform-docs) [![License](https://img.shields.io/github/license/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/blob/master/LICENSE) [![Latest release](https://img.shields.io/github/v/release/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/releases)
 
----
+![terraform-docs-teaser](./images/terraform-docs-teaser.png)
 
-## 📋 Prérequis Locaux
+## What is terraform-docs
 
-Avant de commencer les tests, assurez-vous d'avoir installé sur votre machine :
-1. **Terraform** (Version `>= 1.5.0`)
-2. **AWS CLI v2**
+A utility to generate documentation from Terraform modules in various output formats.
 
-### Configuration des profils AWS SSO
-Pour exécuter le code dans chaque compte de manière sécurisée (recommandation ANSSI), vous devez configurer 4 profils de connexion locale via SSO. Exécutez pour chaque compte :
+## Installation
+
+macOS users can install using [Homebrew]:
+
 ```bash
-aws configure sso
+brew install terraform-docs
 ```
-Configurez-les avec les noms de profils suivants :
-*   `aws-master` : Pour le compte d'administration de l'Organisation.
-*   `aws-shared` : Pour le compte central `shared-services`.
-*   `aws-nonprod` : Pour le compte applicatif `nonprod`.
-*   `aws-prod` : Pour le compte applicatif `prod`.
 
----
+or
 
-## 🛠️ Guide de Test Pas à Pas
+```bash
+brew install terraform-docs/tap/terraform-docs
+```
 
-### Étape 1 : Initialisation de l'Organisation (`live/global-org`)
-Ce module crée la structure d'OUs, les sous-comptes AWS et applique les Service Control Policies (SCPs) globales.
+Windows users can install using [Scoop]:
 
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-master
-    ```
-2.  **Configuration des variables** :
-    *   Allez dans le répertoire : `cd live/global-org/`
-    *   Copiez le fichier d'exemple : `cp terraform.tfvars.example terraform.tfvars`
-    *   Éditez `terraform.tfvars` et indiquez les adresses e-mail uniques requises par AWS pour vos sous-comptes.
-3.  **Test du module** :
-    ```bash
-    terraform init
-    terraform plan
-    ```
+```bash
+scoop bucket add terraform-docs https://github.com/terraform-docs/scoop-bucket
+scoop install terraform-docs
+```
 
----
+or [Chocolatey]:
 
-### Étape 2 : Stockage, Chiffrement et ECR Centraux (`live/shared-services`)
-Ce module crée les ressources communes et partagées de l'organisation : les buckets S3 d'audit, de sauvegardes et d'assets, les clés de chiffrement KMS, ainsi que le registre de conteneurs privé **shared-ecr** (comprenant les dépôts chiffrés pour le frontend et le backend, configurés en mode tag-immutable avec scan automatique).
+```bash
+choco install terraform-docs
+```
 
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-shared
-    ```
-2.  **Configuration des variables** :
-    *   Allez dans le répertoire : `cd ../shared-services/`
-    *   Copiez le fichier d'exemple : `cp terraform.tfvars.example terraform.tfvars`
-    *   Éditez `terraform.tfvars` : indiquez le préfixe souhaité pour vos buckets S3 et renseignez les **IDs des comptes nonprod et prod** (générés et affichés à l'Étape 1).
-3.  **Test du module** :
-    ```bash
-    terraform init
-    terraform plan
-    ```
-4.  **Outputs du registre ECR** :
-    Une fois le module planifié ou appliqué, vérifiez l'output `ecr_repository_urls` qui listera les adresses de connexion pour pousser vos images de conteneurs (ex: `frontend` et `backend`).
+Stable binaries are also available on the [releases] page. To install, download the
+binary for your platform from "Assets" and place this into your `$PATH`:
 
----
+```bash
+curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.19.0/terraform-docs-v0.19.0-$(uname)-amd64.tar.gz
+tar -xzf terraform-docs.tar.gz
+chmod +x terraform-docs
+mv terraform-docs /usr/local/bin/terraform-docs
+```
 
-### Étape 3 : Réseau Fondateur (`live/nonprod/network` & `live/prod/network`)
-Ce module déploie les VPCs isolés en 3 tiers, les NAT Gateways et les VPC Endpoints.
+**NOTE:** Windows releases are in `ZIP` format.
 
-#### Tester l'environnement Non-Prod (np) :
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-nonprod
-    ```
-2.  **Test du module** :
-    *   Allez dans le répertoire : `cd ../nonprod/network/`
-    *   Exécutez :
-        ```bash
-        terraform init
-        terraform plan
-        ```
+The latest version can be installed using `go install` or `go get`:
 
-#### Tester l'environnement Prod (pr) :
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-prod
-    ```
-2.  **Test du module** :
-    *   Allez dans le répertoire : `cd ../../prod/network/`
-    *   Exécutez :
-        ```bash
-        terraform init
-        terraform plan
-        ```
+```bash
+# go1.17+
+go install github.com/terraform-docs/terraform-docs@v0.19.0
+```
 
----
+```bash
+# go1.16
+GO111MODULE="on" go get github.com/terraform-docs/terraform-docs@v0.19.0
+```
 
-### Étape 4 : Base de Données RDS PostgreSQL (`live/nonprod/rds` & `live/prod/rds`)
-Ce module déploie l'instance de base de données PostgreSQL isolée dans le tier data du VPC.
+**NOTE:** please use the latest Go to do this, minimum `go1.16` is required.
 
-#### Tester l'environnement Non-Prod (np) :
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-nonprod
-    ```
-2.  **Configuration des variables** :
-    *   Allez dans le répertoire : `cd ../../nonprod/rds/`
-    *   Créez un fichier `terraform.tfvars` et renseignez le mot de passe administrateur :
-        ```hcl
-        db_admin_password = "VotreMotDePasseTresSecurise123!"
-        ```
-3.  **Test du module** :
-    ```bash
-    terraform init
-    terraform plan
-    ```
+This will put `terraform-docs` in `$(go env GOPATH)/bin`. If you encounter the error
+`terraform-docs: command not found` after installation then you may need to either add
+that directory to your `$PATH` as shown [here] or do a manual installation by cloning
+the repo and run `make build` from the repository which will put `terraform-docs` in:
 
-#### Tester l'environnement Prod (pr) :
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-prod
-    ```
-2.  **Configuration des variables** :
-    *   Allez dans le répertoire : `cd ../../prod/rds/`
-    *   Créez un fichier `terraform.tfvars` et renseignez un mot de passe administrateur fort :
-        ```hcl
-        db_admin_password = "VotreMotDePasseDeProdHyperRobuste987!"
-        ```
-3.  **Test du module** :
-    ```bash
-    terraform init
-    terraform plan
-    ```
+```bash
+$(go env GOPATH)/src/github.com/terraform-docs/terraform-docs/bin/$(uname | tr '[:upper:]' '[:lower:]')-amd64/terraform-docs
+```
 
----
+## Usage
 
-### Étape 5 : Cluster Kubernetes EKS (`live/nonprod/eks` & `live/prod/eks`)
-Ce module déploie le cluster Kubernetes géré, configure le fournisseur OIDC (IRSA) pour la sécurité applicative IAM, et déploie le groupe de nœuds gérés (Managed Node Group) et les add-ons essentiels (EBS CSI pour le stockage, CoreDNS, etc.).
+### Running the binary directly
 
-#### Tester l'environnement Non-Prod (np) :
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-nonprod
-    ```
-2.  **Test du module** :
-    *   Allez dans le répertoire : `cd ../../nonprod/eks/`
-    *   Exécutez :
-        ```bash
-        terraform init
-        terraform plan
-        ```
-3.  **Connexion au cluster (après déploiement)** :
-    Une fois le cluster créé, configurez votre client local `kubectl` :
-    ```bash
-    aws eks update-kubeconfig --region eu-west-1 --name nonprod-eks-cluster --profile aws-nonprod
-    kubectl get nodes
-    ```
+To run and generate documentation into README within a directory:
 
-#### Tester l'environnement Prod (pr) :
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-prod
-    ```
-2.  **Test du module** :
-    *   Allez dans le répertoire : `cd ../../prod/eks/`
-    *   Exécutez :
-        ```bash
-        terraform init
-        terraform plan
-        ```
-3.  **Connexion au cluster (après déploiement)** :
-    ```bash
-    aws eks update-kubeconfig --region eu-west-1 --name prod-eks-cluster --profile aws-prod
-    kubectl get nodes
-    ```
+```bash
+terraform-docs markdown table --output-file README.md --output-mode inject /path/to/module
+```
 
----
+Check [`output`] configuration for more details and examples.
 
-### Étape 6 : DNS Public, Certificat SSL ACM et Sécurité WAFv2 (`live/nonprod/dns-ingress` & `live/prod/dns-ingress`)
-Ce module provisionne la zone publique Route 53 pour la résolution de noms, demande et valide automatiquement un certificat SSL/TLS ACM wildcard par DNS, et déploie un Web ACL WAFv2 régional (avec Rate Limiting et règles managées) pour protéger notre futur Ingress EKS.
+### Using docker
 
-#### Tester l'environnement Non-Prod (np) :
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-nonprod
-    ```
-2.  **Test du module** :
-    *   Allez dans le répertoire : `cd ../../nonprod/dns-ingress/`
-    *   Exécutez :
-        ```bash
-        terraform init
-        terraform plan
-        ```
+terraform-docs can be run as a container by mounting a directory with `.tf`
+files in it and run the following command:
 
-#### Tester l'environnement Prod (pr) :
-1.  **Connexion AWS** :
-    ```bash
-    aws sso login --profile aws-prod
-    ```
-2.  **Test du module** :
-    *   Allez dans le répertoire : `cd ../../prod/dns-ingress/`
-    *   Exécutez :
-        ```bash
-        terraform init
-        terraform plan
-        ```
-### Étape 7 : Gestion des Secrets / Secrets Management (`live/nonprod/eks` & `live/prod/eks`)
-L'intégration du module **10.9 (Secrets Management)** est couplée aux déploiements EKS. Lors de l'exécution de l'Étape 5 d'EKS, le pilote **Secrets Store CSI Driver** et le **Provider AWS (ASCP)** sont installés automatiquement via Helm dans le cluster. De plus, un rôle IAM (IRSA) et un secret chiffré KMS sont provisionnés dans AWS Secrets Manager.
+```bash
+docker run --rm --volume "$(pwd):/terraform-docs" -u $(id -u) quay.io/terraform-docs/terraform-docs:0.19.0 markdown /terraform-docs
+```
 
-#### Valider le Secrets CSI (après déploiement EKS) :
-1.  **Vérifier que les pods du driver CSI tournent** :
-    ```bash
-    kubectl get pods -n kube-system -l app.kubernetes.io/name=secrets-store-csi-driver
-    ```
-2.  **Rôle IAM (IRSA) applicatif** :
-    Vérifiez l'output `secrets_role_arn` retourné par Terraform, qui fournit l'ARN du rôle IAM à annoter sur votre Service Account Kubernetes (`rhzorion-app-sa`).
+If `output.file` is not enabled for this module, generated output can be redirected
+back to a file:
 
----
+```bash
+docker run --rm --volume "$(pwd):/terraform-docs" -u $(id -u) quay.io/terraform-docs/terraform-docs:0.19.0 markdown /terraform-docs > doc.md
+```
 
-### Étape 8 : Observabilité Unifiée - Prometheus, Grafana et Fluent Bit (`live/nonprod/eks` & `live/prod/eks`)
-L'observabilité est intégrée aux déploiements de vos clusters EKS. La stack Prometheus/Grafana supervise les métriques système/applicatives (namespace `monitoring`). Le DaemonSet Fluent Bit collecte tous les logs du cluster (namespace `logging`) et les achemine en double flux vers CloudWatch Logs (diagnostic immédiat) et le bucket S3 centralisé d'audit chiffré (archivage).
+**NOTE:** Docker tag `latest` refers to _latest_ stable released version and `edge`
+refers to HEAD of `master` at any given point in time.
 
-#### Valider la Stack d'Observabilité :
-1.  **Vérifier que les pods de supervision et de logs tournent** :
-    ```bash
-    kubectl get pods -n monitoring
-    ```
-    ```bash
-    kubectl get pods -n logging
-    ```
-2.  **Accéder à l'interface Grafana locale via Port-Forward** :
-    ```bash
-    kubectl port-forward svc/kube-prometheus-stack-grafana 3000:80 -n monitoring
-    ```
-    Ouvrez `http://localhost:3000` (identifiants d'administration par défaut : `admin` / `prom-operator`).
-3.  **Vérifier la transmission des logs** :
-    *   **CloudWatch Logs** : Allez sur la console AWS CloudWatch > Log groups et vérifiez la présence du groupe `/eks/rhzorion/<env>/applications`.
-    *   **S3 Logs** : Ouvrez le bucket S3 d'audit et vérifiez l'écriture des archives dans le chemin `eks/<env>/`.
+### Using GitHub Actions
 
----
+To use terraform-docs GitHub Action, configure a YAML workflow file (e.g.
+`.github/workflows/documentation.yml`) with the following:
 
-## 🧹 Nettoyage des ressources (Indispensable)
+```yaml
+name: Generate terraform docs
+on:
+  - pull_request
 
-> [!CAUTION]
-> Pour un projet éducatif, afin d'éviter tout dépassement de budget ou frais inutiles sur AWS, exécutez la commande suivante dans chaque répertoire dès que vos tests de validation ou démonstrations sont terminés (commencez par détruire l'EKS, puis la RDS, et enfin le Réseau) :
-> ```bash
-> terraform destroy
-> ```
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
 
+    - name: Render terraform docs and push changes back to PR
+      uses: terraform-docs/gh-actions@main
+      with:
+        working-dir: .
+        output-file: README.md
+        output-method: inject
+        git-push: "true"
+```
+
+Read more about [terraform-docs GitHub Action] and its configuration and
+examples.
+
+### pre-commit hook
+
+With pre-commit, you can ensure your Terraform module documentation is kept
+up-to-date each time you make a commit.
+
+First [install pre-commit] and then create or update a `.pre-commit-config.yaml`
+in the root of your Git repo with at least the following content:
+
+```yaml
+repos:
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: "v0.19.0"
+    hooks:
+      - id: terraform-docs-go
+        args: ["markdown", "table", "--output-file", "README.md", "./mymodule/path"]
+```
+
+Then run:
+
+```bash
+pre-commit install
+pre-commit install-hooks
+```
+
+Further changes to your module's `.tf` files will cause an update to documentation
+when you make a commit.
+
+## Configuration
+
+terraform-docs can be configured with a yaml file. The default name of this file is
+`.terraform-docs.yml` and the path order for locating it is:
+
+1. root of module directory
+1. `.config/` folder at root of module directory
+1. current directory
+1. `.config/` folder at current directory
+1. `$HOME/.tfdocs.d/`
+
+```yaml
+formatter: "" # this is required
+
+version: ""
+
+header-from: main.tf
+footer-from: ""
+
+recursive:
+  enabled: false
+  path: modules
+  include-main: true
+
+sections:
+  hide: []
+  show: []
+
+content: ""
+
+output:
+  file: ""
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+output-values:
+  enabled: false
+  from: ""
+
+sort:
+  enabled: true
+  by: name
+
+settings:
+  anchor: true
+  color: true
+  default: true
+  description: false
+  escape: true
+  hide-empty: false
+  html: true
+  indent: 2
+  lockfile: true
+  read-comments: true
+  required: true
+  sensitive: true
+  type: true
+```
+
+## Content Template
+
+Generated content can be customized further away with `content` in configuration.
+If the `content` is empty the default order of sections is used.
+
+Compatible formatters for customized content are `asciidoc` and `markdown`. `content`
+will be ignored for other formatters.
+
+`content` is a Go template with following additional variables:
+
+- `{{ .Header }}`
+- `{{ .Footer }}`
+- `{{ .Inputs }}`
+- `{{ .Modules }}`
+- `{{ .Outputs }}`
+- `{{ .Providers }}`
+- `{{ .Requirements }}`
+- `{{ .Resources }}`
+
+and following functions:
+
+- `{{ include "relative/path/to/file" }}`
+
+These variables are the generated output of individual sections in the selected
+formatter. For example `{{ .Inputs }}` is Markdown Table representation of _inputs_
+when formatter is set to `markdown table`.
+
+Note that sections visibility (i.e. `sections.show` and `sections.hide`) takes
+precedence over the `content`.
+
+Additionally there's also one extra special variable avaialble to the `content`:
+
+- `{{ .Module }}`
+
+As opposed to the other variables mentioned above, which are generated sections
+based on a selected formatter, the `{{ .Module }}` variable is just a `struct`
+representing a [Terraform module].
+
+````yaml
+content: |-
+  Any arbitrary text can be placed anywhere in the content
+
+  {{ .Header }}
+
+  and even in between sections
+
+  {{ .Providers }}
+
+  and they don't even need to be in the default order
+
+  {{ .Outputs }}
+
+  include any relative files
+
+  {{ include "relative/path/to/file" }}
+
+  {{ .Inputs }}
+
+  # Examples
+
+  ```hcl
+  {{ include "examples/foo/main.tf" }}
+  ```
+
+  ## Resources
+
+  {{ range .Module.Resources }}
+  - {{ .GetMode }}.{{ .Spec }} ({{ .Position.Filename }}#{{ .Position.Line }})
+  {{- end }}
+````
+
+## Build on top of terraform-docs
+
+terraform-docs primary use-case is to be utilized as a standalone binary, but
+some parts of it is also available publicly and can be imported in your project
+as a library.
+
+```go
+import (
+    "github.com/terraform-docs/terraform-docs/format"
+    "github.com/terraform-docs/terraform-docs/print"
+    "github.com/terraform-docs/terraform-docs/terraform"
+)
+
+// buildTerraformDocs for module root `path` and provided content `tmpl`.
+func buildTerraformDocs(path string, tmpl string) (string, error) {
+    config := print.DefaultConfig()
+    config.ModuleRoot = path // module root path (can be relative or absolute)
+
+    module, err := terraform.LoadWithOptions(config)
+    if err != nil {
+        return "", err
+    }
+
+    // Generate in Markdown Table format
+    formatter := format.NewMarkdownTable(config)
+
+    if err := formatter.Generate(module); err != nil {
+        return "", err
+    }
+
+    // // Note: if you don't intend to provide additional template for the generated
+    // // content, or the target format doesn't provide templating (e.g. json, yaml,
+    // // xml, or toml) you can use `Content()` function instead of `Render()`.
+    // // `Content()` returns all the sections combined with predefined order.
+    // return formatter.Content(), nil
+
+    return formatter.Render(tmpl)
+}
+```
+
+## Plugin
+
+Generated output can be heavily customized with [`content`], but if using that
+is not enough for your use-case, you can write your own plugin.
+
+In order to install a plugin the following steps are needed:
+
+- download the plugin and place it in `~/.tfdocs.d/plugins` (or `./.tfdocs.d/plugins`)
+- make sure the plugin file name is `tfdocs-format-<NAME>`
+- modify [`formatter`] of `.terraform-docs.yml` file to be `<NAME>`
+
+**Important notes:**
+
+- if the plugin file name is different than the example above, terraform-docs won't
+be able to to pick it up nor register it properly
+- you can only use plugin thorough `.terraform-docs.yml` file and it cannot be used
+with CLI arguments
+
+To create a new plugin create a new repository called `tfdocs-format-<NAME>` with
+following `main.go`:
+
+```go
+package main
+
+import (
+    _ "embed" //nolint
+
+    "github.com/terraform-docs/terraform-docs/plugin"
+    "github.com/terraform-docs/terraform-docs/print"
+    "github.com/terraform-docs/terraform-docs/template"
+    "github.com/terraform-docs/terraform-docs/terraform"
+)
+
+func main() {
+    plugin.Serve(&plugin.ServeOpts{
+        Name:    "<NAME>",
+        Version: "0.1.0",
+        Printer: printerFunc,
+    })
+}
+
+//go:embed sections.tmpl
+var tplCustom []byte
+
+// printerFunc the function being executed by the plugin client.
+func printerFunc(config *print.Config, module *terraform.Module) (string, error) {
+    tpl := template.New(config,
+        &template.Item{Name: "custom", Text: string(tplCustom)},
+    )
+
+    rendered, err := tpl.Render("custom", module)
+    if err != nil {
+        return "", err
+    }
+
+    return rendered, nil
+}
+```
+
+Please refer to [tfdocs-format-template] for more details. You can create a new
+repository from it by clicking on `Use this template` button.
+
+## Documentation
+
+- **Users**
+  - Read the [User Guide] to learn how to use terraform-docs
+  - Read the [Formats Guide] to learn about different output formats of terraform-docs
+  - Refer to [Config File Reference] for all the available configuration options
+- **Developers**
+  - Read [Contributing Guide] before submitting a pull request
+
+Visit [our website] for all documentation.
+
+## Community
+
+- Discuss terraform-docs on [Slack]
+
+## License
+
+MIT License - Copyright (c) 2021 The terraform-docs Authors.
+
+[Chocolatey]: https://www.chocolatey.org
+[Config File Reference]: https://terraform-docs.io/user-guide/configuration/
+[`content`]: https://terraform-docs.io/user-guide/configuration/content/
+[Contributing Guide]: CONTRIBUTING.md
+[Formats Guide]: https://terraform-docs.io/reference/terraform-docs/
+[`formatter`]: https://terraform-docs.io/user-guide/configuration/formatter/
+[here]: https://golang.org/doc/code.html#GOPATH
+[Homebrew]: https://brew.sh
+[install pre-commit]: https://pre-commit.com/#install
+[`output`]: https://terraform-docs.io/user-guide/configuration/output/
+[releases]: https://github.com/terraform-docs/terraform-docs/releases
+[Scoop]: https://scoop.sh/
+[Slack]: https://slack.terraform-docs.io/
+[terraform-docs GitHub Action]: https://github.com/terraform-docs/gh-actions
+[Terraform module]: https://pkg.go.dev/github.com/terraform-docs/terraform-docs/terraform#Module
+[tfdocs-format-template]: https://github.com/terraform-docs/tfdocs-format-template
+[our website]: https://terraform-docs.io/
+[User Guide]: https://terraform-docs.io/user-guide/introduction/

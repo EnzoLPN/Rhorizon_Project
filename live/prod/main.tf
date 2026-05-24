@@ -20,6 +20,7 @@ module "network" {
   enable_phz               = true
   private_domain_name      = var.private_domain_name
   enable_vpc_endpoints     = true
+  project_name = var.project_name
 }
 
 # --- 2. Module Base de Données RDS ---
@@ -34,7 +35,7 @@ module "rds" {
   allocated_storage     = 50
   max_allocated_storage = 200
 
-  db_name        = "rhorizon_prod"
+  db_name        = "${var.project_name}_prod"
   admin_username = "dbadmin"
   admin_password = var.db_admin_password
 
@@ -44,6 +45,7 @@ module "rds" {
   skip_final_snapshot     = false
   storage_encrypted       = true
   kms_key_arn             = data.terraform_remote_state.shared.outputs.kms_backups_key_arn
+  project_name = var.project_name
 }
 
 # --- 3. Module Cluster EKS ---
@@ -58,6 +60,12 @@ module "eks_cluster" {
   desired_size       = var.eks_desired_size
   min_size           = var.eks_min_size
   max_size           = var.eks_max_size
+
+  admin_roles = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/OrganizationAccountAccessRole",
+    data.terraform_remote_state.shared.outputs.github_actions_prod_role_arn
+  ]
+  project_name = var.project_name
 }
 
 # --- 4. Module DNS et Ingress ---
@@ -68,6 +76,7 @@ module "dns_ingress" {
   domain_name               = var.domain_name
   create_public_zone        = true
   enable_extended_waf_rules = true
+  project_name = var.project_name
 }
 
 # --- 5. Module Gestion des Secrets ---
@@ -80,6 +89,7 @@ module "secrets_management" {
   kms_key_arn       = data.terraform_remote_state.shared.outputs.kms_assets_key_arn
 
   depends_on = [module.eks_cluster]
+  project_name = var.project_name
 }
 
 # --- 5b. Module AWS Load Balancer Controller ---
@@ -94,6 +104,7 @@ module "aws_load_balancer_controller" {
   aws_region        = var.aws_region
 
   depends_on = [module.eks_cluster]
+  project_name = var.project_name
 }
 
 # --- 6. Module Observabilité ---
@@ -111,7 +122,8 @@ module "observability" {
   acm_certificate_arn     = module.dns_ingress.acm_certificate_arn
   waf_web_acl_arn         = module.dns_ingress.waf_web_acl_arn
 
-  depends_on = [module.eks_cluster, module.aws_load_balancer_controller]
+  depends_on   = [module.eks_cluster, module.aws_load_balancer_controller]
+  project_name = var.project_name
 }
 
 # --- 7. Delegation Route53 automatique de rhorizon.xyz dans la zone parente (compte shared) ---
@@ -154,7 +166,12 @@ module "ssm_bastion" {
   vpc_id                = module.network.vpc_id
   subnet_id             = module.network.private_subnet_ids[0]
   rds_security_group_id = module.network.rds_security_group_id
+  project_name = var.project_name
 }
+
+# --- 10. Identité appelante ---
+data "aws_caller_identity" "current" {}
+
 
 
 

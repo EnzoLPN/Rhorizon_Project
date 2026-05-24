@@ -85,3 +85,9 @@ variable "shared_services_state_path" {
   type    = string
   default = "../shared-services/terraform.tfstate"
 }
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

@@ -1,3 +1,4 @@
+project_name       = "rhorizon"
 environment        = "prod"
 aws_profile        = "aws-prod"
 aws_region         = "eu-west-1"
@@ -19,8 +20,5 @@ eks_desired_size   = 3
 eks_min_size       = 3
 eks_max_size       = 6
 
-# RDS - À passer via la variable d'environnement TF_VAR_db_admin_password en prod !
-# db_admin_password = "..." # NE PAS COMMITER EN CLAIR
-
-# Chemin vers le tfstate de shared-services
-shared_services_state_path = "../shared-services/terraform.tfstate"
+# RDS - Géré automatiquement via AWS Secrets Manager
+# shared_services_state_path = "../shared-services/terraform.tfstate"

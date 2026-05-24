@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Enzo Loppin &amp; Antimi" />
+  <title>Rapport Technique ASD - Plateforme RHZORION</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+  
+  
+  
+  
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Rapport Technique ASD - Plateforme RHZORION</h1>
+<p class="author">Enzo Loppin &amp; Antimi</p>
+<p class="date">Mai 2026</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#projet-asd-architecture-de-sécurité-distribuée" id="toc-projet-asd-architecture-de-sécurité-distribuée"><span class="toc-section-number">1</span> 🚀 Projet ASD : Architecture de
+Sécurité Distribuée</a>
+<ul>
+<li><a href="#présentation-générale" id="toc-présentation-générale"><span class="toc-section-number">1.1</span> 📌 Présentation Générale</a></li>
+<li><a href="#philosophie-du-projet" id="toc-philosophie-du-projet"><span class="toc-section-number">1.2</span> 🏗️ Philosophie du Projet</a></li>
+<li><a href="#architecture-de-la-landing-zone" id="toc-architecture-de-la-landing-zone"><span class="toc-section-number">1.3</span> 🏗️ Architecture de la Landing
+Zone</a></li>
+<li><a href="#les-piliers-de-sécurité-conformité-anssi" id="toc-les-piliers-de-sécurité-conformité-anssi"><span class="toc-section-number">1.4</span> 🛡️ Les Piliers de Sécurité
+(Conformité ANSSI)</a>
+<ul>
+<li><a href="#isolation-moindre-privilège-r4-r11" id="toc-isolation-moindre-privilège-r4-r11"><span class="toc-section-number">1.4.1</span> 1. Isolation &amp; Moindre
+Privilège (R4, R11)</a></li>
+<li><a href="#sécurité-applicative-conteneurs-r2-r8" id="toc-sécurité-applicative-conteneurs-r2-r8"><span class="toc-section-number">1.4.2</span> 2. Sécurité Applicative &amp;
+Conteneurs (R2, R8)</a></li>
+<li><a href="#protection-des-données-r7" id="toc-protection-des-données-r7"><span class="toc-section-number">1.4.3</span> 3. Protection des Données
+(R7)</a></li>
+</ul></li>
+<li><a href="#observabilité-résilience" id="toc-observabilité-résilience"><span class="toc-section-number">1.5</span> 📊 Observabilité &amp;
+Résilience</a></li>
+<li><a href="#stack-technique" id="toc-stack-technique"><span class="toc-section-number">1.6</span> 🛠️ Stack Technique</a></li>
+</ul></li>
+<li><a href="#référentiel-darchitecture-aws-landing-zone-asd" id="toc-référentiel-darchitecture-aws-landing-zone-asd"><span class="toc-section-number">2</span> Référentiel d’Architecture AWS &amp;
+Landing Zone (ASD)</a>
+<ul>
+<li><a href="#schéma-conceptuel-multi-comptes" id="toc-schéma-conceptuel-multi-comptes"><span class="toc-section-number">2.1</span> 🗺️ Schéma Conceptuel
+Multi-Comptes</a></li>
+<li><a href="#organisation-multi-comptes-aws-organizations" id="toc-organisation-multi-comptes-aws-organizations"><span class="toc-section-number">2.2</span> 🏢 1. Organisation Multi-Comptes
+(AWS Organizations)</a></li>
+<li><a href="#fiches-techniques-par-compte" id="toc-fiches-techniques-par-compte"><span class="toc-section-number">2.3</span> 🛠️ 2. Fiches Techniques par
+Compte</a>
+<ul>
+<li><a href="#a.-compte-shared-services-116101833976" id="toc-a.-compte-shared-services-116101833976"><span class="toc-section-number">2.3.1</span> 📂 A. Compte
+<code>shared-services</code> (116101833976)</a></li>
+<li><a href="#b.-compte-nonprod-083127296598" id="toc-b.-compte-nonprod-083127296598"><span class="toc-section-number">2.3.2</span> 📂 B. Compte
+<code>nonprod</code> (083127296598)</a></li>
+<li><a href="#c.-compte-prod-593402827099" id="toc-c.-compte-prod-593402827099"><span class="toc-section-number">2.3.3</span> 📂 C. Compte <code>prod</code>
+(593402827099)</a></li>
+</ul></li>
+<li><a href="#liaisons-flux-transverses-cross-account" id="toc-liaisons-flux-transverses-cross-account"><span class="toc-section-number">2.4</span> 🔄 3. Liaisons &amp; Flux
+Transverses (Cross-Account)</a></li>
+</ul></li>
+<li><a href="#matrice-de-flux-et-groupes-de-sécurité-security-groups" id="toc-matrice-de-flux-et-groupes-de-sécurité-security-groups"><span class="toc-section-number">3</span> Matrice de Flux et Groupes de
+Sécurité (Security Groups)</a>
+<ul>
+<li><a href="#principes-de-filtrage" id="toc-principes-de-filtrage"><span class="toc-section-number">3.1</span> 🛡️ Principes de Filtrage</a></li>
+<li><a href="#matrice-de-flux-inter-tiers" id="toc-matrice-de-flux-inter-tiers"><span class="toc-section-number">3.2</span> 📊 Matrice de Flux
+Inter-Tiers</a></li>
+<li><a href="#détail-des-security-groups" id="toc-détail-des-security-groups"><span class="toc-section-number">3.3</span> 🛠️ Détail des Security Groups</a>
+<ul>
+<li><a href="#sg-alb-load-balancer-public" id="toc-sg-alb-load-balancer-public"><span class="toc-section-number">3.3.1</span> 1. SG-ALB (Load Balancer
+Public)</a></li>
+<li><a href="#sg-app-cluster-eks-nodes" id="toc-sg-app-cluster-eks-nodes"><span class="toc-section-number">3.3.2</span> 2. SG-APP (Cluster EKS /
+Nodes)</a></li>
+<li><a href="#sg-rds-base-de-données" id="toc-sg-rds-base-de-données"><span class="toc-section-number">3.3.3</span> 3. SG-RDS (Base de
+Données)</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#gestion-des-identités-iam-et-du-chiffrement-kms" id="toc-gestion-des-identités-iam-et-du-chiffrement-kms"><span class="toc-section-number">4</span> Gestion des Identités (IAM) et du
+Chiffrement (KMS)</a>
+<ul>
+<li><a href="#gestion-des-identités-et-des-accès-iam" id="toc-gestion-des-identités-et-des-accès-iam"><span class="toc-section-number">4.1</span> 🔑 Gestion des Identités et des
+Accès (IAM)</a>
+<ul>
+<li><a href="#concepts-clés" id="toc-concepts-clés"><span class="toc-section-number">4.1.1</span> 🛡️ Concepts Clés</a></li>
+<li><a href="#principaux-rôles-iam" id="toc-principaux-rôles-iam"><span class="toc-section-number">4.1.2</span> 📊 Principaux Rôles IAM</a></li>
+</ul></li>
+<li><a href="#stratégie-de-chiffrement-aws-kms" id="toc-stratégie-de-chiffrement-aws-kms"><span class="toc-section-number">4.2</span> 🔒 Stratégie de Chiffrement (AWS
+KMS)</a>
+<ul>
+<li><a href="#sécurité-des-clés" id="toc-sécurité-des-clés"><span class="toc-section-number">4.2.1</span> 🛡️ Sécurité des Clés</a></li>
+<li><a href="#utilisation-des-clés-kms" id="toc-utilisation-des-clés-kms"><span class="toc-section-number">4.2.2</span> 🛠️ Utilisation des Clés
+KMS</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#scan-de-sécurité-de-linfrastructure-checkov" id="toc-scan-de-sécurité-de-linfrastructure-checkov"><span class="toc-section-number">5</span> Scan de Sécurité de l’Infrastructure
+(Checkov)</a>
+<ul>
+<li><a href="#résumé-du-scan" id="toc-résumé-du-scan"><span class="toc-section-number">5.1</span> 📊 Résumé du Scan</a></li>
+<li><a href="#analyse-des-points-critiques-identifiés" id="toc-analyse-des-points-critiques-identifiés"><span class="toc-section-number">5.2</span> 🛡️ Analyse des points critiques
+identifiés</a>
+<ul>
+<li><a href="#identité-et-accès-iam" id="toc-identité-et-accès-iam"><span class="toc-section-number">5.2.1</span> 1. Identité et Accès
+(IAM)</a></li>
+<li><a href="#sécurité-du-cluster-eks-remédié" id="toc-sécurité-du-cluster-eks-remédié"><span class="toc-section-number">5.2.2</span> 2. Sécurité du Cluster EKS
+(Remédié ✅)</a></li>
+<li><a href="#base-de-données-rds-remédié" id="toc-base-de-données-rds-remédié"><span class="toc-section-number">5.2.3</span> 3. Base de Données RDS (Remédié
+✅)</a></li>
+<li><a href="#réseau-security-groups" id="toc-réseau-security-groups"><span class="toc-section-number">5.2.4</span> 4. Réseau (Security
+Groups)</a></li>
+</ul></li>
+<li><a href="#conclusion-du-scan" id="toc-conclusion-du-scan"><span class="toc-section-number">5.3</span> 🚀 Conclusion du Scan</a></li>
+</ul></li>
+<li><a href="#analyse-de-risques-globale-modélisation-des-menaces-conformité-anssi-r10" id="toc-analyse-de-risques-globale-modélisation-des-menaces-conformité-anssi-r10"><span class="toc-section-number">6</span> Analyse de Risques Globale &amp;
+Modélisation des Menaces (Conformité ANSSI R10)</a>
+<ul>
+<li><a href="#chemins-de-compromission-vecteurs-dattaque" id="toc-chemins-de-compromission-vecteurs-dattaque"><span class="toc-section-number">6.1</span> 🗺️ 1. Chemins de Compromission
+&amp; Vecteurs d’Attaque</a></li>
+<li><a href="#analyse-détaillée-des-risques-et-contre-mesures" id="toc-analyse-détaillée-des-risques-et-contre-mesures"><span class="toc-section-number">6.2</span> 🛡️ 2. Analyse Détaillée des
+Risques et Contre-Mesures</a>
+<ul>
+<li><a href="#vecteur-a-compromission-du-poste-développeur-workstation-compromise" id="toc-vecteur-a-compromission-du-poste-développeur-workstation-compromise"><span class="toc-section-number">6.2.1</span> Vecteur A : Compromission du
+Poste Développeur (Workstation Compromise)</a></li>
+<li><a href="#vecteur-b-risque-de-la-chaîne-dapprovisionnement-supply-chain-tierce-partie" id="toc-vecteur-b-risque-de-la-chaîne-dapprovisionnement-supply-chain-tierce-partie"><span class="toc-section-number">6.2.2</span> Vecteur B : Risque de la Chaîne
+d’Approvisionnement (Supply Chain / Tierce partie)</a></li>
+<li><a href="#vecteur-c-compromission-de-la-chaîne-cicd-github-actions" id="toc-vecteur-c-compromission-de-la-chaîne-cicd-github-actions"><span class="toc-section-number">6.2.3</span> Vecteur C : Compromission de la
+Chaîne CI/CD (GitHub Actions)</a></li>
+<li><a href="#vecteur-d-compromission-de-linfrastructure-cloud-aws-eks-rds" id="toc-vecteur-d-compromission-de-linfrastructure-cloud-aws-eks-rds"><span class="toc-section-number">6.2.4</span> Vecteur D : Compromission de
+l’Infrastructure Cloud (AWS / EKS / RDS)</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#cartographie-applicative-matrice-de-flux-conformité-anssi-r9" id="toc-cartographie-applicative-matrice-de-flux-conformité-anssi-r9"><span class="toc-section-number">7</span> Cartographie Applicative &amp;
+Matrice de Flux (Conformité ANSSI R9)</a>
+<ul>
+<li><a href="#cartographie-des-droits-système-privilèges" id="toc-cartographie-des-droits-système-privilèges"><span class="toc-section-number">7.1</span> 🔑 1. Cartographie des Droits
+Système &amp; Privilèges</a>
+<ul>
+<li><a href="#a.-rôles-iam-cicd-github-actions" id="toc-a.-rôles-iam-cicd-github-actions"><span class="toc-section-number">7.1.1</span> A. Rôles IAM CI/CD (GitHub
+Actions)</a></li>
+<li><a href="#b.-accès-dadministration-aux-clusters-eks" id="toc-b.-accès-dadministration-aux-clusters-eks"><span class="toc-section-number">7.1.2</span> B. Accès d’Administration aux
+Clusters EKS</a></li>
+<li><a href="#c.-droits-daccès-applicatifs-irsa" id="toc-c.-droits-daccès-applicatifs-irsa"><span class="toc-section-number">7.1.3</span> C. Droits d’Accès Applicatifs
+(IRSA)</a></li>
+</ul></li>
+<li><a href="#inventaire-cycle-de-vie-des-secrets" id="toc-inventaire-cycle-de-vie-des-secrets"><span class="toc-section-number">7.2</span> 🔒 2. Inventaire &amp; Cycle de
+Vie des Secrets</a>
+<ul>
+<li><a href="#a.-secrets-de-fonctionnement-aws-secrets-manager" id="toc-a.-secrets-de-fonctionnement-aws-secrets-manager"><span class="toc-section-number">7.2.1</span> A. Secrets de Fonctionnement
+(AWS Secrets Manager)</a></li>
+</ul></li>
+<li><a href="#matrice-de-flux-réseau-table-de-filtrage-conformité-anssi-r9" id="toc-matrice-de-flux-réseau-table-de-filtrage-conformité-anssi-r9"><span class="toc-section-number">7.3</span> 🔄 3. Matrice de Flux Réseau &amp;
+Table de Filtrage (Conformité ANSSI R9)</a>
+<ul>
+<li><a href="#matrice-exhaustive-des-flux-réseau" id="toc-matrice-exhaustive-des-flux-réseau"><span class="toc-section-number">7.3.1</span> Matrice Exhaustive des Flux
+Réseau :</a></li>
+</ul></li>
+<li><a href="#gouvernance-droits-daccès-des-développeurs" id="toc-gouvernance-droits-daccès-des-développeurs"><span class="toc-section-number">7.4</span> 👥 4. Gouvernance &amp; Droits
+d’Accès des Développeurs</a></li>
+</ul></li>
+<li><a href="#guide-de-développement-sécurisé-asd" id="toc-guide-de-développement-sécurisé-asd"><span class="toc-section-number">8</span> Guide de Développement Sécurisé
+(ASD)</a>
+<ul>
+<li><a href="#prévention-des-injections-sql" id="toc-prévention-des-injections-sql"><span class="toc-section-number">8.1</span> 🛡️ 1. Prévention des Injections
+SQL</a>
+<ul>
+<li><a href="#mauvaise-pratique-vulnérable" id="toc-mauvaise-pratique-vulnérable"><span class="toc-section-number">8.1.1</span> ❌ Mauvaise Pratique
+(Vulnérable) :</a></li>
+<li><a href="#bonne-pratique-sécurisée" id="toc-bonne-pratique-sécurisée"><span class="toc-section-number">8.1.2</span> Bonne Pratique (Sécurisée)
+:</a></li>
+</ul></li>
+<li><a href="#sécurisation-des-politiques-cors-cross-origin-resource-sharing" id="toc-sécurisation-des-politiques-cors-cross-origin-resource-sharing"><span class="toc-section-number">8.2</span> 🌐 2. Sécurisation des Politiques
+CORS (Cross-Origin Resource Sharing)</a>
+<ul>
+<li><a href="#exemple-de-configuration" id="toc-exemple-de-configuration"><span class="toc-section-number">8.2.1</span> Exemple de configuration
+:</a></li>
+</ul></li>
+<li><a href="#gestion-des-erreurs-et-fuites-dinformations" id="toc-gestion-des-erreurs-et-fuites-dinformations"><span class="toc-section-number">8.3</span> 🚨 3. Gestion des Erreurs et
+Fuites d’Informations</a>
+<ul>
+<li><a href="#mauvaise-pratique" id="toc-mauvaise-pratique"><span class="toc-section-number">8.3.1</span> ❌ Mauvaise Pratique :</a></li>
+<li><a href="#bonne-pratique" id="toc-bonne-pratique"><span class="toc-section-number">8.3.2</span> Bonne Pratique :</a></li>
+</ul></li>
+<li><a href="#durcissement-des-images-docker-privilèges" id="toc-durcissement-des-images-docker-privilèges"><span class="toc-section-number">8.4</span> 🐳 4. Durcissement des Images
+Docker &amp; Privilèges</a></li>
+<li><a href="#outils-danalyse-statique-sast-locaux" id="toc-outils-danalyse-statique-sast-locaux"><span class="toc-section-number">8.5</span> 🔍 5. Outils d’Analyse Statique
+(SAST) Locaux</a></li>
+</ul></li>
+<li><a href="#documentation-technique-des-modules" id="toc-documentation-technique-des-modules"><span class="toc-section-number">9</span> Documentation Technique des
+Modules</a></li>
+</ul>
+</nav>
+<h1 data-number="1" id="projet-asd-architecture-de-sécurité-distribuée"><span class="header-section-number">1</span> 🚀 Projet ASD : Architecture de
+Sécurité Distribuée</h1>
+<h2 data-number="1.1" id="présentation-générale"><span class="header-section-number">1.1</span> 📌 Présentation Générale</h2>
+<p>Le projet <strong>ASD</strong> (Architecture de Sécurité Distribuée)
+est une plateforme SaaS moderne et hautement sécurisée déployée sur
+<strong>AWS</strong>. Développé dans le cadre d’un <strong>projet de fin
+d’année</strong>, ce travail vise à démontrer la mise en œuvre concrète
+d’une infrastructure “Cloud-Native” respectant les standards de sécurité
+les plus exigeants, notamment les recommandations de
+l’<strong>ANSSI</strong>.</p>
+<p><strong>Équipe :</strong> Enzo Loppin &amp; Antimi</p>
+<hr />
+<h2 data-number="1.2" id="philosophie-du-projet"><span class="header-section-number">1.2</span> 🏗️ Philosophie du Projet</h2>
+<p>Dès sa conception, le projet a été bâti sur deux piliers fondamentaux
+: * <strong>Modularité</strong> : L’ensemble de l’infrastructure est
+découpé en modules Terraform indépendants et réutilisables. *
+<strong>Reproductibilité</strong> : Grâce à une gestion dynamique des
+variables (notamment le nom du projet), l’intégralité de la Landing Zone
+et de la stack applicative peut être redéployée en quelques minutes pour
+un nouveau client ou un nouvel environnement.</p>
+<hr />
+<h2 data-number="1.3" id="architecture-de-la-landing-zone"><span class="header-section-number">1.3</span> 🏗️ Architecture de la Landing
+Zone</h2>
+<p>Nous avons implémenté une <strong>Landing Zone multi-comptes</strong>
+pour garantir une isolation totale des ressources et des responsabilités
+:</p>
+<ol type="1">
+<li><strong>Compte Master</strong> : Gouvernance de l’organisation AWS
+et gestion des accès (SSO).</li>
+<li><strong>Compte Shared Services</strong> : Centre névralgique partagé
+(Registres ECR, DNS parent, stockage centralisé des logs et
+sauvegardes).</li>
+<li><strong>Compte Non-Prod</strong> : Environnement de développement et
+de tests (Staging).</li>
+<li><strong>Compte Prod</strong> : Environnement de production hautement
+disponible et durci.</li>
+</ol>
+<hr />
+<h2 data-number="1.4" id="les-piliers-de-sécurité-conformité-anssi"><span class="header-section-number">1.4</span> 🛡️ Les Piliers de Sécurité
+(Conformité ANSSI)</h2>
+<p>Consultez notre <strong><a href="./anssi_checklist.md">Checklist de
+Conformité ANSSI détaillée</a></strong> pour voir l’ensemble des points
+de contrôle implémentés.</p>
+<h3 data-number="1.4.1" id="isolation-moindre-privilège-r4-r11"><span class="header-section-number">1.4.1</span> 1. Isolation &amp; Moindre
+Privilège (R4, R11)</h3>
+<ul>
+<li><strong>Architecture Réseau 3-Tiers</strong> : Le VPC est découpé en
+trois zones d’isolation logique :
+<ul>
+<li><strong>Tier Public</strong> : Reçoit uniquement l’Ingress ALB et
+les NAT Gateways. Aucune ressource applicative n’est exposée ici.</li>
+<li><strong>Tier Privé</strong> : Héberge le cluster EKS. Les pods sont
+isolés d’internet et ne peuvent communiquer vers l’extérieur que via les
+NAT Gateways.</li>
+<li><strong>Tier Data</strong> : Zone ultra-isolée sans aucune route
+vers internet, dédiée exclusivement à la base de données RDS
+PostgreSQL.</li>
+</ul></li>
+<li>Authentification <strong>OIDC</strong> pour la CI/CD (GitHub
+Actions) sans clés statiques. Les pipelines sont limités au build et
+scan des images.</li>
+<li><strong>Souveraineté de l’Infrastructure</strong> : Le déploiement
+IaC est volontairement exclu de la CI/CD pour prévenir les supply-chain
+attacks. L’administration se fait exclusivement via un <strong>SSM
+Bastion Host</strong> sécurisé (pas de ports SSH ouverts).</li>
+</ul>
+<h3 data-number="1.4.2" id="sécurité-applicative-conteneurs-r2-r8"><span class="header-section-number">1.4.2</span> 2. Sécurité Applicative &amp;
+Conteneurs (R2, R8)</h3>
+<ul>
+<li><strong>Signature des images</strong> : Toutes les images Docker
+sont signées avec <strong>Cosign</strong>.</li>
+<li><strong>Contrôle d’admission</strong> : Utilisation de
+<strong>Kyverno</strong> pour bloquer toute image non signée dans le
+cluster.</li>
+<li><strong>Runtime Security</strong> : Les conteneurs s’exécutent en
+mode non-root avec des privilèges restreints.</li>
+</ul>
+<h3 data-number="1.4.3" id="protection-des-données-r7"><span class="header-section-number">1.4.3</span> 3. Protection des Données
+(R7)</h3>
+<ul>
+<li>Chiffrement intégral au repos et en transit via <strong>AWS
+KMS</strong>.</li>
+<li><strong>Object Lock</strong> (WORM) sur les logs d’audit pour
+garantir leur intégrité légale.</li>
+<li>Base de données <strong>RDS PostgreSQL</strong> isolée dans des
+sous-réseaux non-routables.</li>
+</ul>
+<hr />
+<h2 data-number="1.5" id="observabilité-résilience"><span class="header-section-number">1.5</span> 📊 Observabilité &amp;
+Résilience</h2>
+<ul>
+<li><strong>Supervision</strong> : Stack Prometheus &amp; Grafana pour
+le monitoring en temps réel.</li>
+<li><strong>Logs Centralisés</strong> : Collecte via Fluent Bit vers
+CloudWatch et archivage longue durée sur S3.</li>
+<li><strong>Haute Disponibilité</strong> : Déploiement Multi-AZ en
+production pour garantir la continuité de service.</li>
+</ul>
+<hr />
+<h2 data-number="1.6" id="stack-technique"><span class="header-section-number">1.6</span> 🛠️ Stack Technique</h2>
+<ul>
+<li><strong>Infrastructure</strong> : Terraform (IaC)</li>
+<li><strong>Cloud</strong> : Amazon Web Services (AWS)</li>
+<li><strong>Orchestration</strong> : Kubernetes (Amazon EKS)</li>
+<li><strong>Base de données</strong> : PostgreSQL (Amazon RDS)</li>
+<li><strong>Sécurité</strong> : WAF v2, KMS, Secrets Manager, Kyverno,
+Cosign</li>
+<li><strong>CI/CD</strong> : GitHub Actions</li>
+</ul>
+<h1 data-number="2" id="référentiel-darchitecture-aws-landing-zone-asd"><span class="header-section-number">2</span> Référentiel d’Architecture AWS
+&amp; Landing Zone (ASD)</h1>
+<p>Ce document décrit l’architecture multi-comptes réelle du projet
+<strong>ASD</strong>, telle qu’elle est implémentée dans les
+configurations Terraform et de CI/CD.</p>
+<hr />
+<h2 data-number="2.1" id="schéma-conceptuel-multi-comptes"><span class="header-section-number">2.1</span> 🗺️ Schéma Conceptuel
+Multi-Comptes</h2>
+<pre class="mermaid"><code>graph TD
+  subgraph AWS_Org [&quot;AWS Organization (Landing Zone)&quot;]
+    
+    %% COMPTE SHARED SERVICES (Pas de VPC)
+    subgraph Acc_Shared [&quot;Compte: Shared Services (116101833976)&quot;]
+      ParentDNS[&quot;Route 53 Parent (rhorizon.xyz)&quot;]
+      ECR[&quot;Amazon ECR Central Registry&quot;]
+      KMS_Keys[&quot;KMS Keys (logs, backups, assets)&quot;]
+      S3_Buckets[&quot;S3 Buckets (audit-logs, backups, assets)&quot;]
+      OIDC_Provider[&quot;IAM OIDC Provider (GitHub Actions)&quot;]
+    end
+
+    %% COMPTE NON-PROD
+    subgraph Acc_NonProd [&quot;Compte: Non-Prod (083127296598)&quot;]
+      ChildDNS_NP[&quot;Route 53 Zone (nonprod.rhorizon.xyz)&quot;]
+      subgraph VPC_NP [&quot;VPC Non-Prod (10.10.0.0/16)&quot;]
+        NAT_NP[&quot;NAT Gateway Single&quot;]
+        subgraph Subnet_NP_Pub [&quot;Subnet Public&quot;]
+          ALB_NP[&quot;WAF &amp; ALB Ingress&quot;]
+        end
+        subgraph Subnet_NP_Priv [&quot;Subnet Privé&quot;]
+          EKS_NP[&quot;EKS Cluster (nonprod-eks-cluster)&quot;]
+          Bastion_NP[&quot;SSM Bastion Host&quot;]
+        end
+        subgraph Subnet_NP_Data [&quot;Subnet Data&quot;]
+          RDS_NP[&quot;RDS PostgreSQL Single-AZ&quot;]
+        end
+      end
+    end
+
+    %% COMPTE PROD
+    subgraph Acc_Prod [&quot;Compte: Prod (593402827099)&quot;]
+      ChildDNS_P[&quot;Route 53 Zone (rhorizon.xyz)&quot;]
+      subgraph VPC_P [&quot;VPC Prod (10.20.0.0/16)&quot;]
+        NAT_P[&quot;NAT Gateways (Multi-AZ)&quot;]
+        VPCE_P[&quot;VPC Endpoints (PrivateLink)&quot;]
+        subgraph Subnet_P_Pub [&quot;Subnet Public&quot;]
+          ALB_P[&quot;WAF &amp; ALB Ingress&quot;]
+        end
+        subgraph Subnet_P_Priv [&quot;Subnet Privé&quot;]
+          EKS_P[&quot;EKS Cluster (prod-eks-cluster)&quot;]
+          Bastion_P[&quot;SSM Bastion Host&quot;]
+        end
+        subgraph Subnet_P_Data [&quot;Subnet Data&quot;]
+          RDS_P[&quot;RDS PostgreSQL Multi-AZ&quot;]
+        end
+      end
+    end
+
+  end
+
+  %% Relations &amp; Flux Cross-Account
+  OIDC_Provider -.-&gt;|&quot;Assume Role / Deploy&quot;| EKS_NP
+  OIDC_Provider -.-&gt;|&quot;Assume Role / Deploy&quot;| EKS_P
+  ECR -.-&gt;|&quot;Docker Pull&quot;| EKS_NP
+  ECR -.-&gt;|&quot;Docker Pull&quot;| EKS_P
+  ParentDNS --&gt;|&quot;NS Delegation&quot;| ChildDNS_NP
+  ParentDNS --&gt;|&quot;NS Delegation&quot;| ChildDNS_P
+  EKS_NP -.-&gt;|&quot;Write Logs &amp; Backups&quot;| S3_Buckets
+  EKS_P -.-&gt;|&quot;Write Logs &amp; Backups&quot;| S3_Buckets</code></pre>
+<hr />
+<h2 data-number="2.2" id="organisation-multi-comptes-aws-organizations"><span class="header-section-number">2.2</span> 🏢 1. Organisation
+Multi-Comptes (AWS Organizations)</h2>
+<p>L’architecture est découpée en trois comptes AWS distincts pour
+garantir une isolation de sécurité et de facturation :</p>
+<ol type="1">
+<li><strong>Compte Master / Root</strong> (<code>global-org</code>) :
+Gestion de l’organisation et du Single Sign-On (AWS IAM Identity
+Center).</li>
+<li><strong>Compte Shared Services</strong>
+(<code>shared-services</code>) : Dépôts d’images, DNS parent, stockage
+centralisé des logs/backups et authentification CI/CD.</li>
+<li><strong>Compte Non-Prod</strong> (<code>nonprod</code>) :
+Environnement de développement et de staging.</li>
+<li><strong>Compte Prod</strong> (<code>prod</code>) : Environnement de
+production.</li>
+</ol>
+<hr />
+<h2 data-number="2.3" id="fiches-techniques-par-compte"><span class="header-section-number">2.3</span> 🛠️ 2. Fiches Techniques par
+Compte</h2>
+<h3 data-number="2.3.1" id="a.-compte-shared-services-116101833976"><span class="header-section-number">2.3.1</span> 📂 A. Compte
+<code>shared-services</code> (116101833976)</h3>
+<ul>
+<li><strong>VPC Network</strong> : <strong>Aucun VPC</strong>. Toutes
+les ressources de ce compte sont globales ou régionales, sans
+attachement réseau local.</li>
+<li><strong>Composants clés</strong> :
+<ul>
+<li><strong>Route 53</strong> : Zone DNS parente racine
+<code>rhorizon.xyz</code>. Reçoit les serveurs de noms (NS) depuis
+Namecheap. Elle délègue les sous-domaines aux comptes enfants.</li>
+<li><strong>Amazon ECR</strong> : Registre centralisé
+(<code>rhzorion/frontend</code> et <code>rhzorion/backend</code>). Une
+politique ECR cross-account autorise les comptes <code>nonprod</code> et
+<code>prod</code> à tirer (pull) les images Docker.</li>
+<li><strong>Amazon S3 &amp; KMS</strong> :
+<ul>
+<li>Bucket <code>rhorizon-audit-logs</code> (activé avec <strong>Object
+Lock</strong> en mode Compliance de 90 jours pour l’immuabilité légale
+des logs d’audit).</li>
+<li>Bucket <code>rhorizon-central-backups</code> pour le stockage des
+sauvegardes RDS.</li>
+<li>Bucket <code>rhorizon-app-assets</code> pour les objets
+applicatifs.</li>
+<li>3 clés KMS gérées par le compte et partagées avec rotation
+automatique des clés activée.</li>
+</ul></li>
+<li><strong>IAM OIDC &amp; CI/CD</strong> :
+<ul>
+<li>Fournisseur OIDC configuré pour <strong>GitHub Actions</strong>
+(<code>token.actions.githubusercontent.com</code>).</li>
+<li>Rôle IAM <code>shared-github-actions-role</code> disposant de la
+politique <code>AdministratorAccess</code>.</li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h3 data-number="2.3.2" id="b.-compte-nonprod-083127296598"><span class="header-section-number">2.3.2</span> 📂 B. Compte
+<code>nonprod</code> (083127296598)</h3>
+<ul>
+<li><strong>VPC Network</strong> : VPC <code>10.10.0.0/16</code> réparti
+sur 2 Zones de Disponibilité (AZ).
+<ul>
+<li><strong>Public Subnets</strong> : NAT Gateway (stratégie
+<code>single</code> pour économie de coûts) et Ingress Application Load
+Balancer (ALB).</li>
+<li><strong>Private Subnets</strong> : Instances EKS (pas d’IP
+publique). Accès internet sortant via la NAT Gateway.</li>
+<li><strong>Data Subnets</strong> : Instances RDS PostgreSQL. Totalement
+isolées (aucune route vers internet).</li>
+<li><strong>VPC Endpoints</strong> : Désactivés (choix d’optimisation
+budgétaire).</li>
+</ul></li>
+<li><strong>Composants clés</strong> :
+<ul>
+<li><strong>Base de données RDS</strong> :
+<ul>
+<li>Instance unique PostgreSQL (<code>db.t4g.micro</code>, 20 Go).</li>
+<li>Pas de Multi-AZ. Protection contre la suppression désactivée.</li>
+</ul></li>
+<li><strong>Cluster EKS</strong> :
+<ul>
+<li><code>nonprod-eks-cluster</code> (Kubernetes v1.32).</li>
+<li>Managed node group d’instances <code>t3.medium</code>.</li>
+<li>Access Entry configuré pour autoriser l’administration k8s par
+l’identité IAM assumée par GitHub Actions.</li>
+</ul></li>
+<li><strong>Réseau Kubernetes</strong> :
+<ul>
+<li><code>network-policy.yaml</code> restreignant l’accès au backend
+uniquement depuis le pod frontend.</li>
+</ul></li>
+<li><strong>Secrets</strong> : Secrets Store CSI Driver + AWS Secrets
+Manager Provider (ASCP) synchronisant les secrets préfixés par
+<code>nonprod/rhzorion/</code>.</li>
+<li><strong>Bastion</strong> : SSM Bastion Host hébergé en subnet privé
+pour l’administration et les tunnels de base de données (sécurité sans
+SSH ouvert).</li>
+<li><strong>Observabilité</strong> : Kube-Prometheus-Stack +
+Grafana.</li>
+</ul></li>
+</ul>
+<hr />
+<h3 data-number="2.3.3" id="c.-compte-prod-593402827099"><span class="header-section-number">2.3.3</span> 📂 C. Compte
+<code>prod</code> (593402827099)</h3>
+<ul>
+<li><strong>VPC Network</strong> : VPC <code>10.20.0.0/16</code> réparti
+sur 3 Zones de Disponibilité (AZ) pour la haute disponibilité.
+<ul>
+<li><strong>Public Subnets</strong> : NAT Gateways redondantes (une par
+AZ) et Ingress ALB.</li>
+<li><strong>Private Subnets</strong> : EKS Nodes (haute
+disponibilité).</li>
+<li><strong>Data Subnets</strong> : RDS PostgreSQL Multi-AZ.</li>
+<li><strong>VPC Endpoints (AWS PrivateLink)</strong> :
+<strong>Activés</strong>. Les API AWS (KMS, ECR, Secrets Manager,
+CloudWatch, STS) et S3 (Gateway) sont appelées en interne sans transiter
+par internet.</li>
+</ul></li>
+<li><strong>Composants clés</strong> :
+<ul>
+<li><strong>Base de données RDS</strong> :
+<ul>
+<li>Instance PostgreSQL Multi-AZ (<code>db.t4g.medium</code>, 50 Go)
+pour basculement automatique.</li>
+<li>Chiffrement activé avec la clé KMS partagée depuis le compte
+<code>shared-services</code>.</li>
+<li>Protection contre la suppression activée, sauvegardes conservées 30
+jours, snapshots finaux obligatoires.</li>
+</ul></li>
+<li><strong>Cluster EKS</strong> :
+<ul>
+<li><code>prod-eks-cluster</code> (Kubernetes v1.32).</li>
+<li>Managed node group Multi-AZ auto-scalable.</li>
+</ul></li>
+<li><strong>Ingress &amp; DNS</strong> :
+<ul>
+<li>Certificat SSL ACM et AWS WAF avec <strong>règles étendues</strong>
+activées pour parer les attaques complexes (OWASP Top 10).</li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 data-number="2.4" id="liaisons-flux-transverses-cross-account"><span class="header-section-number">2.4</span> 🔄 3. Liaisons &amp; Flux
+Transverses (Cross-Account)</h2>
+<ol type="1">
+<li><p><strong>Résolution DNS</strong> : Le registrar externe
+(Namecheap) délègue la gestion de la zone DNS racine
+<code>rhorizon.xyz</code> au serveur Route 53 du compte
+<code>shared-services</code>. Le compte <code>shared-services</code>
+délègue :</p>
+<ul>
+<li>Le sous-domaine <code>nonprod.rhorizon.xyz</code> vers le compte
+<code>nonprod</code>.</li>
+<li>Le sous-domaine <code>prod.rhorizon.xyz</code> vers le compte
+<code>prod</code>.</li>
+</ul></li>
+<li><p><strong>Rapports &amp; Logs Centralisés</strong> : Les workloads
+d’EKS (Non-Prod &amp; Prod) envoient leurs sauvegardes et les logs de
+sécurité (Fluent Bit, CloudWatch) vers les buckets S3 du compte
+<code>shared-services</code> en chiffrant les flux via les clés KMS
+centralisées.</p></li>
+<li><p><strong>Déploiement CI/CD</strong> :</p>
+<ul>
+<li>GitHub Actions s’authentifie via OIDC auprès du compte
+<code>shared-services</code> pour endosser le rôle
+d’administration.</li>
+<li>Il utilise ensuite les rôles EKS Access Entries locaux dans chaque
+compte pour déployer les manifests applicatifs sur les clusters
+<code>nonprod</code> et <code>prod</code>.</li>
+</ul></li>
+</ol>
+<h1 data-number="3" id="matrice-de-flux-et-groupes-de-sécurité-security-groups"><span class="header-section-number">3</span> Matrice de Flux et Groupes de
+Sécurité (Security Groups)</h1>
+<p>L’infrastructure RHZORION repose sur une segmentation réseau stricte
+par <strong>Security Groups (SG)</strong>, agissant comme des pare-feu à
+état (stateful) au niveau des interfaces réseau (ENI).</p>
+<h2 data-number="3.1" id="principes-de-filtrage"><span class="header-section-number">3.1</span> 🛡️ Principes de Filtrage</h2>
+<ul>
+<li><strong>Principe du moindre privilège</strong> : Seuls les flux
+strictement nécessaires au fonctionnement des services sont
+autorisés.</li>
+<li><strong>Chaînage de Security Groups</strong> : Au lieu d’utiliser
+des plages IP (CIDR), les règles utilisent les IDs des SGs sources,
+garantissant que seule la ressource légitime peut communiquer, même si
+son IP change.</li>
+<li><strong>Egress Control</strong> : Le trafic sortant est restreint
+vers l’Internet, privilégiant les VPC Endpoints pour les services
+AWS.</li>
+</ul>
+<h2 data-number="3.2" id="matrice-de-flux-inter-tiers"><span class="header-section-number">3.2</span> 📊 Matrice de Flux
+Inter-Tiers</h2>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 27%" />
+<col style="width: 31%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Source SG</th>
+<th>Destination SG</th>
+<th>Port / Protocole</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Any (0.0.0.0/0)</strong></td>
+<td>Public ALB</td>
+<td>80/443 (TCP)</td>
+<td>Accès utilisateur web (HTTP/HTTPS)</td>
+</tr>
+<tr class="even">
+<td><strong>Public ALB</strong></td>
+<td>EKS Nodes (App)</td>
+<td>8080-8443 (TCP)</td>
+<td>Transfert du trafic vers les conteneurs</td>
+</tr>
+<tr class="odd">
+<td><strong>EKS Nodes (App)</strong></td>
+<td>RDS Database</td>
+<td>5432 (TCP)</td>
+<td>Accès à la base de données PostgreSQL</td>
+</tr>
+<tr class="even">
+<td><strong>EKS Nodes (App)</strong></td>
+<td>Any (0.0.0.0/0)</td>
+<td>53 (UDP/TCP)</td>
+<td>Résolution DNS (CoreDNS)</td>
+</tr>
+<tr class="odd">
+<td><strong>EKS Nodes (App)</strong></td>
+<td>Any (0.0.0.0/0)</td>
+<td>443 (TCP)</td>
+<td>Appels API AWS (via NAT ou Endpoints)</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="3.3" id="détail-des-security-groups"><span class="header-section-number">3.3</span> 🛠️ Détail des Security
+Groups</h2>
+<h3 data-number="3.3.1" id="sg-alb-load-balancer-public"><span class="header-section-number">3.3.1</span> 1. SG-ALB (Load Balancer
+Public)</h3>
+<ul>
+<li><strong>Rôle</strong> : Point d’entrée unique de la plateforme.</li>
+<li><strong>Entrée</strong> : Autorise HTTP (80) et HTTPS (443) depuis
+n’importe où.</li>
+<li><strong>Sortie</strong> : Restreint aux ports applicatifs du tier
+EKS uniquement.</li>
+</ul>
+<h3 data-number="3.3.2" id="sg-app-cluster-eks-nodes"><span class="header-section-number">3.3.2</span> 2. SG-APP (Cluster EKS /
+Nodes)</h3>
+<ul>
+<li><strong>Rôle</strong> : Hébergement des micro-services backend et
+frontend.</li>
+<li><strong>Entrée</strong> : Flux limités provenant de l’ALB sur les
+ports de service. Autorise également les flux internes Kubernetes
+(CoreDNS).</li>
+<li><strong>Sortie</strong> : Limitée à la base de données (5432) et aux
+services externes essentiels (443 pour les API AWS).</li>
+</ul>
+<h3 data-number="3.3.3" id="sg-rds-base-de-données"><span class="header-section-number">3.3.3</span> 3. SG-RDS (Base de
+Données)</h3>
+<ul>
+<li><strong>Rôle</strong> : Tier de données persistant.</li>
+<li><strong>Entrée</strong> : <strong>Strictement limité</strong> au
+trafic provenant du SG-APP sur le port 5432. Aucune autre source ne peut
+interroger la base.</li>
+<li><strong>Sortie</strong> : Limitée au sein du VPC uniquement.</li>
+</ul>
+<h1 data-number="4" id="gestion-des-identités-iam-et-du-chiffrement-kms"><span class="header-section-number">4</span> Gestion des Identités (IAM) et du
+Chiffrement (KMS)</h1>
+<p>La sécurité de la plateforme RHZORION repose sur une gestion
+granulaire des droits d’accès et une protection systématique des données
+au repos via le chiffrement.</p>
+<h2 data-number="4.1" id="gestion-des-identités-et-des-accès-iam"><span class="header-section-number">4.1</span> 🔑 Gestion des Identités et des
+Accès (IAM)</h2>
+<p>L’architecture IAM suit strictement le principe du <strong>moindre
+privilège</strong> et favorise l’utilisation d’identités temporaires
+plutôt que de clés d’accès statiques.</p>
+<h3 data-number="4.1.1" id="concepts-clés"><span class="header-section-number">4.1.1</span> 🛡️ Concepts Clés</h3>
+<ul>
+<li><strong>IRSA (IAM Roles for Service Accounts)</strong> : Les
+applications tournant sur EKS n’utilisent pas les droits des nœuds de
+calcul. Chaque micro-service possède son propre rôle IAM via un
+fournisseur OIDC, limitant ainsi l’impact en cas de compromission d’un
+Pod.</li>
+<li><strong>Fédération d’Identité (OIDC)</strong> : Pour le déploiement
+CI/CD, GitHub Actions utilise des rôles IAM temporaires via OIDC,
+supprimant le besoin de stocker des <code>AWS_ACCESS_KEY</code> dans les
+secrets GitHub.</li>
+<li><strong>Séparation des Privilèges</strong> : Les rôles sont
+segmentés par fonction (Cluster EKS, Nœuds, Driver CSI, Gestion des
+Secrets).</li>
+</ul>
+<h3 data-number="4.1.2" id="principaux-rôles-iam"><span class="header-section-number">4.1.2</span> 📊 Principaux Rôles IAM</h3>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 22%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rôle</th>
+<th>Portée</th>
+<th>Fonction de Sécurité</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>eks-cluster-role</code></td>
+<td>EKS Control Plane</td>
+<td>Permet à AWS de gérer les ressources réseau et de calcul pour
+Kubernetes.</td>
+</tr>
+<tr class="even">
+<td><code>eks-node-role</code></td>
+<td>Worker Nodes</td>
+<td>Droits limités pour rejoindre le cluster et tirer des images
+ECR.</td>
+</tr>
+<tr class="odd">
+<td><code>secrets-app-role</code></td>
+<td>Pods applicatifs</td>
+<td>Autorise uniquement la lecture des secrets spécifiques dans Secrets
+Manager.</td>
+</tr>
+<tr class="even">
+<td><code>fluent-bit-role</code></td>
+<td>Observabilité</td>
+<td>Permet l’envoi sécurisé des logs vers CloudWatch et S3.</td>
+</tr>
+<tr class="odd">
+<td>`github-actions-role`</td>
+<td>CI/CD (Build/Scan)</td>
+<td>Droits limités au push ECR et au scan de vulnérabilités. Aucun droit
+de modification de l’infrastructure.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 data-number="4.2" id="stratégie-de-chiffrement-aws-kms"><span class="header-section-number">4.2</span> 🔒 Stratégie de Chiffrement
+(AWS KMS)</h2>
+<p>Toutes les données sensibles (logs, backups, images, secrets) sont
+chiffrées avec des <strong>Customer Managed Keys (CMK)</strong>, offrant
+un contrôle total sur les politiques d’accès.</p>
+<h3 data-number="4.2.1" id="sécurité-des-clés"><span class="header-section-number">4.2.1</span> 🛡️ Sécurité des Clés</h3>
+<ul>
+<li><strong>Rotation Automatique</strong> : Les clés KMS sont
+configurées pour une rotation annuelle automatique des matériaux de
+clé.</li>
+<li><strong>Politiques de Clé (Key Policies)</strong> : L’accès aux clés
+est restreint au niveau du service AWS et du rôle IAM utilisateur,
+empêchant même les administrateurs globaux d’accéder aux données sans
+autorisation spécifique.</li>
+<li><strong>Séparation des Tâches</strong> : Des clés distinctes sont
+utilisées pour les logs, les sauvegardes et les assets afin de
+compartimenter les risques.</li>
+</ul>
+<h3 data-number="4.2.2" id="utilisation-des-clés-kms"><span class="header-section-number">4.2.2</span> 🛠️ Utilisation des Clés
+KMS</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 20%" />
+<col style="width: 54%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clé KMS</th>
+<th>Usage</th>
+<th>Bénéfice Sécurité</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>KMS Logs</strong></td>
+<td>CloudWatch, S3 Logs, Flow Logs</td>
+<td>Confidentialité des traces d’audit et des journaux applicatifs.</td>
+</tr>
+<tr class="even">
+<td><strong>KMS Backups</strong></td>
+<td>Snapshots RDS, S3 Backups</td>
+<td>Protection des données de secours contre l’extraction non
+autorisée.</td>
+</tr>
+<tr class="odd">
+<td><strong>KMS ECR</strong></td>
+<td>Images Docker</td>
+<td>Chiffrement des artefacts logiciels avant déploiement.</td>
+</tr>
+<tr class="even">
+<td><strong>KMS Secrets</strong></td>
+<td>Secrets Manager</td>
+<td>Sur-chiffrement des mots de passe et clés API en base.</td>
+</tr>
+</tbody>
+</table>
+<h1 data-number="5" id="scan-de-sécurité-de-linfrastructure-checkov"><span class="header-section-number">5</span> Scan de Sécurité de
+l’Infrastructure (Checkov)</h1>
+<p>Dans le cadre de la démarche <strong>DevSecOps</strong> du projet
+RHZORION, un scan automatisé de l’infrastructure en tant que code (IaC)
+a été réalisé à l’aide de l’outil <strong>Checkov</strong>.</p>
+<h2 data-number="5.1" id="résumé-du-scan"><span class="header-section-number">5.1</span> 📊 Résumé du Scan</h2>
+<ul>
+<li><strong>Total de tests passés</strong> : 244</li>
+<li><strong>Total de tests échoués</strong> : 61</li>
+<li><strong>Conformité globale</strong> : ~80%</li>
+</ul>
+<h2 data-number="5.2" id="analyse-des-points-critiques-identifiés"><span class="header-section-number">5.2</span> 🛡️ Analyse des points critiques
+identifiés</h2>
+<p>Le scan a identifié plusieurs axes d’amélioration, dont certains sont
+des choix de conception assumés pour ce prototype, tandis que d’autres
+feront l’objet d’une remédiation future.</p>
+<h3 data-number="5.2.1" id="identité-et-accès-iam"><span class="header-section-number">5.2.1</span> 1. Identité et Accès
+(IAM)</h3>
+<ul>
+<li><strong>Observation</strong> : Certaines politiques IAM pour les
+rôles GitHub Actions sont jugées trop permissives (usage de l’action
+<code>*</code>).</li>
+<li><strong>Justification ASD</strong> : Les rôles sont restreints par
+des conditions de confiance OIDC, limitant l’usage au dépôt spécifique.
+Une granularité plus fine sera appliquée en phase de production.</li>
+</ul>
+<h3 data-number="5.2.2" id="sécurité-du-cluster-eks-remédié"><span class="header-section-number">5.2.2</span> 2. Sécurité du Cluster EKS
+(Remédié ✅)</h3>
+<ul>
+<li><strong>Action réalisée</strong> : L’accès public à l’API Kubernetes
+a été totalement <strong>désactivé</strong> (`endpoint_public_access =
+false`). L’administration se fait désormais exclusivement via le
+<strong>bastion SSM</strong> présent dans le VPC.</li>
+<li><strong>Logging</strong> : Les 5 types de logs du control plane
+(API, Audit, Authenticator, etc.) ont été activés pour une traçabilité
+complète.</li>
+<li><strong>Impact</strong> : Élimination de la surface d’attaque
+externe sur le plan de contrôle Kubernetes.</li>
+</ul>
+<h3 data-number="5.2.3" id="base-de-données-rds-remédié"><span class="header-section-number">5.2.3</span> 3. Base de Données RDS
+(Remédié ✅)</h3>
+<ul>
+<li><strong>Action réalisée</strong> : L’authentification IAM
+(`iam_database_authentication_enabled = true`) a été activée.</li>
+<li><strong>Fonctionnement</strong> : Les applications n’ont plus besoin
+de stocker un mot de passe en dur. Elles génèrent un jeton
+d’authentification temporaire via leur rôle IAM pour se connecter à la
+base.</li>
+<li><strong>Sécurité</strong> : Suppression totale des risques liés à la
+fuite de mots de passe statiques et rotation automatique gérée par
+IAM.</li>
+</ul>
+<h3 data-number="5.2.4" id="réseau-security-groups"><span class="header-section-number">5.2.4</span> 4. Réseau (Security
+Groups)</h3>
+<ul>
+<li><strong>Observation</strong> : Le Security Group de l’ALB autorise
+le port 80 (HTTP).</li>
+<li><strong>Justification</strong> : Le port 80 est ouvert uniquement
+pour effectuer une redirection forcée vers le port 443 (HTTPS),
+conformément aux standards web actuels.</li>
+</ul>
+<h2 data-number="5.3" id="conclusion-du-scan"><span class="header-section-number">5.3</span> 🚀 Conclusion du Scan</h2>
+<p>La majorité des contrôles de sécurité fondamentaux (chiffrement KMS
+au repos, isolation des sous-réseaux, immuabilité ECR) sont
+<strong>validés</strong>. Les points restants concernent principalement
+le durcissement (hardening) avancé et le monitoring détaillé, qui
+s’inscrivent dans le cycle d’amélioration continue du projet.</p>
+<h1 data-number="6" id="analyse-de-risques-globale-modélisation-des-menaces-conformité-anssi-r10"><span class="header-section-number">6</span> Analyse de Risques Globale &amp;
+Modélisation des Menaces (Conformité ANSSI R10)</h1>
+<p>Ce document présente l’analyse de risques et la modélisation des
+chemins de compromission du projet <strong>ASD</strong>, conformément
+aux exigences de la recommandation <strong>R10 de l’ANSSI</strong>.</p>
+<hr />
+<h2 data-number="6.1" id="chemins-de-compromission-vecteurs-dattaque"><span class="header-section-number">6.1</span> 🗺️ 1. Chemins de Compromission
+&amp; Vecteurs d’Attaque</h2>
+<p>L’analyse de risque identifie quatre grands vecteurs d’attaque sur
+notre architecture cloud et logicielle :</p>
+<pre><code>[Attaquant]
+     │
+     ├──► [Poste Développeur] ──────► Vol de jetons, Commits malveillants
+     ├──► [Dépendances / Tierce] ───► Empoisonnement de packages (Supply Chain)
+     ├──► [Chaîne CI/CD (GitHub)] ──► Compromission de runner, élévation AWS
+     └──► [Infrastructure AWS] ────► Exploits réseau, accès API EKS, fuite BDD</code></pre>
+<hr />
+<h2 data-number="6.2" id="analyse-détaillée-des-risques-et-contre-mesures"><span class="header-section-number">6.2</span> 🛡️ 2. Analyse Détaillée des
+Risques et Contre-Mesures</h2>
+<h3 data-number="6.2.1" id="vecteur-a-compromission-du-poste-développeur-workstation-compromise"><span class="header-section-number">6.2.1</span> Vecteur A : Compromission du
+Poste Développeur (Workstation Compromise)</h3>
+<ul>
+<li><strong>Description</strong> : Un attaquant compromet la machine
+d’un développeur (via phishing, malware) pour récupérer ses accès
+AWS/Git ou injecter du code malveillant directement dans le dépôt.</li>
+<li><strong>Gravité Potentielle</strong> : Critique (accès direct au
+code source).</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Scénarios de Risque</th>
+<th style="text-align: left;">Contre-Mesures Implémentées dans le
+Projet</th>
+<th style="text-align: center;">Statut</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Fuite de clés d’accès AWS
+statiques</strong></td>
+<td style="text-align: left;"><strong>Zéro clé AWS statique</strong> :
+Les développeurs utilisent l’authentification SSO via AWS IAM Identity
+Center. La CI/CD utilise des rôles OIDC temporaires sans secrets
+stockés.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Commit de code malveillant
+usurpant l’identité</strong></td>
+<td style="text-align: left;"><strong>Signature des Commits obligatoire
+(R3)</strong> : Intégration du workflow
+<code>check-signed-commits.yml</code> qui rejette toute PR contenant des
+commits non signés cryptographiquement par la clé privée du
+développeur.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Poussée accidentelle de secrets
+(mots de passe, tokens)</strong></td>
+<td style="text-align: left;"><strong>Scan de Secrets pré-build
+(R1)</strong> : Trivy FS analyse le dépôt local et la CI/CD à la
+recherche de secrets en clair avant chaque build.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 data-number="6.2.2" id="vecteur-b-risque-de-la-chaîne-dapprovisionnement-supply-chain-tierce-partie"><span class="header-section-number">6.2.2</span> Vecteur B : Risque de la
+Chaîne d’Approvisionnement (Supply Chain / Tierce partie)</h3>
+<ul>
+<li><strong>Description</strong> : Compromission de librairies externes
+(via empoisonnement de package pip) ou de l’image de base
+Nginx/Python.</li>
+<li><strong>Gravité Potentielle</strong> : Élevée (exécution de code
+arbitraire dans les conteneurs).</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Scénarios de Risque</th>
+<th style="text-align: left;">Contre-Mesures Implémentées dans le
+Projet</th>
+<th style="text-align: center;">Statut</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Introduction de dépendances
+vulnérables</strong></td>
+<td style="text-align: left;"><strong>Scan de vulnérabilités
+applicatives (SCA) (R1)</strong> : <code>pip-audit</code> analyse
+systématiquement le fichier <code>requirements.txt</code> du backend
+dans la CI/CD pour bloquer les packages vulnérables.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Image de base Docker
+vulnérable</strong></td>
+<td style="text-align: left;"><strong>Hardening &amp; Scan Trivy
+(R8)</strong> : Utilisation d’images minimales
+(<code>python-slim</code>, <code>nginx-unprivileged:alpine</code>) et
+scan Trivy régulier des images construites avant déploiement.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Substitution d’image Docker dans
+le registre (ECR)</strong></td>
+<td style="text-align: left;"><strong>Signature et Admission Control
+(R2)</strong> : Les images ECR de production sont signées via Cosign, et
+le contrôleur d’admission Kyverno sur EKS bloque le démarrage de tout
+conteneur non signé.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 data-number="6.2.3" id="vecteur-c-compromission-de-la-chaîne-cicd-github-actions"><span class="header-section-number">6.2.3</span> Vecteur C : Compromission de
+la Chaîne CI/CD (GitHub Actions)</h3>
+<ul>
+<li><strong>Description</strong> : Un attaquant exploite un runner ou
+une vulnérabilité de workflow pour exécuter des scripts malveillants et
+tenter de s’emparer des droits d’administration AWS de la CI/CD.</li>
+<li><strong>Gravité Potentielle</strong> : Critique (compromission de la
+Landing Zone).</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Scénarios de Risque</th>
+<th style="text-align: left;">Contre-Mesures Implémentées dans le
+Projet</th>
+<th style="text-align: center;">Statut</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Élévation de privilèges vers la
+Production depuis une branche de Dev</strong></td>
+<td style="text-align: left;"><strong>Ségrégation stricte des rôles OIDC
+(R4)</strong> : Le rôle OIDC de Non-Prod n’a aucun droit sur le compte
+<code>prod</code>. Le rôle OIDC de Prod ne peut être endossé que depuis
+la branche <code>main</code> protégée.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Persistance latérale sur les
+serveurs de build</strong></td>
+<td style="text-align: left;"><strong>Environnements éphémères
+(R5)</strong> : Utilisation exclusive de runners virtuels vierges
+détruits immédiatement après usage.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 data-number="6.2.4" id="vecteur-d-compromission-de-linfrastructure-cloud-aws-eks-rds"><span class="header-section-number">6.2.4</span> Vecteur D : Compromission de
+l’Infrastructure Cloud (AWS / EKS / RDS)</h3>
+<ul>
+<li><strong>Description</strong> : Attaque réseau directe sur la base de
+données RDS, l’API EKS, ou rebond latéral depuis un pod compromis.</li>
+<li><strong>Gravité Potentielle</strong> : Critique (fuite de
+données).</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Scénarios de Risque</th>
+<th style="text-align: left;">Contre-Mesures Implémentées dans le
+Projet</th>
+<th style="text-align: center;">Statut</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Accès direct et non authentifié à
+la base de données RDS</strong></td>
+<td style="text-align: left;"><strong>Réseau isolé &amp; Moindre
+Privilège</strong> : RDS est dans des subnets Data sans route internet.
+Le Security Group RDS n’autorise que les flux venant du SG d’EKS. Pas de
+SSH public (Bastion SSM privé uniquement).</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Rebond depuis un conteneur web
+compromis</strong></td>
+<td style="text-align: left;"><strong>Lecture seule et Network Policies
+(R8 &amp; R9)</strong> : Les pods tournent en lecture seule
+(<code>readOnlyRootFilesystem: true</code>), sans capacités Linux
+(<code>drop: [ALL]</code>). Les NetworkPolicies Kubernetes bloquent le
+trafic latéral.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Prise de contrôle de l’API Server
+EKS</strong> :</td>
+<td style="text-align: left;"><strong>EKS Access Entries &amp; OIDC
+(R12)</strong> : Remplacement de l’ancienne ConfigMap vulnérable
+<code>aws-auth</code> par les Access Entries natives gérées par AWS
+IAM.</td>
+<td style="text-align: center;"><strong>SÉCURISÉ</strong></td>
+</tr>
+</tbody>
+</table>
+<h1 data-number="7" id="cartographie-applicative-matrice-de-flux-conformité-anssi-r9"><span class="header-section-number">7</span> Cartographie Applicative &amp;
+Matrice de Flux (Conformité ANSSI R9)</h1>
+<p>Ce document dresse la cartographie complète de l’application
+<strong>RHZORION</strong> et de ses dépendances d’infrastructure,
+détaillant les droits système, l’inventaire des secrets, les flux réseau
+et les rôles de gouvernance.</p>
+<hr />
+<h2 data-number="7.1" id="cartographie-des-droits-système-privilèges"><span class="header-section-number">7.1</span> 🔑 1. Cartographie des Droits
+Système &amp; Privilèges</h2>
+<p>L’architecture utilise le principe du moindre privilège, matérialisé
+par des rôles IAM AWS, des politiques d’accès Kubernetes et des
+mécanismes IRSA (IAM Roles for Service Accounts) :</p>
+<h3 data-number="7.1.1" id="a.-rôles-iam-cicd-github-actions"><span class="header-section-number">7.1.1</span> A. Rôles IAM CI/CD (GitHub
+Actions)</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Identité IAM</th>
+<th style="text-align: left;">Contexte d’Utilisation</th>
+<th style="text-align: left;">Droits &amp; Privilèges</th>
+<th style="text-align: left;">Source de Contrôle</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>shared-github-actions-nonprod-role</code></td>
+<td style="text-align: left;">Exécution des tests et déploiement
+Non-Prod.</td>
+<td style="text-align: left;">- Assumer des rôles uniquement dans le
+compte <code>nonprod</code> (<code>083127296598</code>).<br>- Lecture
+seule ECR.</td>
+<td style="text-align: left;"><code>modules/cicd-infra/main.tf</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>shared-github-actions-prod-role</code></td>
+<td style="text-align: left;">Déploiement Production (déclenché depuis
+la branche <code>main</code>).</td>
+<td style="text-align: left;">- Assumer des rôles dans le compte
+<code>prod</code> (<code>593402827099</code>).<br>- Administrateur local
+sur <code>shared-services</code>.</td>
+<td style="text-align: left;"><code>modules/cicd-infra/main.tf</code></td>
+</tr>
+</tbody>
+</table>
+<h3 data-number="7.1.2" id="b.-accès-dadministration-aux-clusters-eks"><span class="header-section-number">7.1.2</span> B. Accès d’Administration aux
+Clusters EKS</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Identité AWS</th>
+<th style="text-align: left;">Niveau d’accès EKS</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Mécanisme de contrôle</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>OrganizationAccountAccessRole</code></td>
+<td style="text-align: left;"><code>AmazonEKSClusterAdminPolicy</code></td>
+<td style="text-align: left;">Droits d’administration totale du cluster
+pour l’équipe DevOps.</td>
+<td style="text-align: left;">EKS Access Entries
+(<code>eks-basic</code>)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>shared-github-actions-nonprod-role</code></td>
+<td style="text-align: left;"><code>AmazonEKSClusterAdminPolicy</code></td>
+<td style="text-align: left;">Droits de déploiement automatique sur le
+cluster Non-Prod.</td>
+<td style="text-align: left;">EKS Access Entries
+(<code>live/nonprod/main.tf</code>)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>shared-github-actions-prod-role</code></td>
+<td style="text-align: left;"><code>AmazonEKSClusterAdminPolicy</code></td>
+<td style="text-align: left;">Droits de déploiement automatique sur le
+cluster Prod.</td>
+<td style="text-align: left;">EKS Access Entries
+(<code>live/prod/main.tf</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 data-number="7.1.3" id="c.-droits-daccès-applicatifs-irsa"><span class="header-section-number">7.1.3</span> C. Droits d’Accès Applicatifs
+(IRSA)</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Pod / ServiceAccount Kubernetes</th>
+<th style="text-align: left;">Rôle IAM Associé (IRSA)</th>
+<th style="text-align: left;">Privilèges Accordés</th>
+<th style="text-align: left;">Raison d’être</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>rhorizon-backend-sa</code> (dans le
+namespace <code>rhorizon</code>)</td>
+<td style="text-align: left;"><code>rhorizon-[env]-backend-s3-role</code></td>
+<td style="text-align: left;">- <code>s3:GetObject</code>,
+<code>PutObject</code>, <code>DeleteObject</code> sur le bucket
+d’assets.<br>- <code>kms:Decrypt</code>, <code>GenerateDataKey</code>
+sur la clé KMS des assets.</td>
+<td style="text-align: left;">Le backend doit stocker et lire les
+documents utilisateurs dans le bucket S3 sécurisé.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>rhzorion-app-sa</code> (dans le
+namespace <code>default</code>)</td>
+<td style="text-align: left;"><code>[env]-eks-secrets-role</code></td>
+<td style="text-align: left;">-
+<code>secretsmanager:GetSecretValue</code> sur le chemin
+<code>${env}/rhzorion/*</code>.</td>
+<td style="text-align: left;">Le CSI Driver a besoin de ce rôle pour
+charger et synchroniser les secrets AWS.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 data-number="7.2" id="inventaire-cycle-de-vie-des-secrets"><span class="header-section-number">7.2</span> 🔒 2. Inventaire &amp; Cycle de
+Vie des Secrets</h2>
+<p>Aucun secret n’est stocké en dur ou stocké dans les configurations
+Git.</p>
+<h3 data-number="7.2.1" id="a.-secrets-de-fonctionnement-aws-secrets-manager"><span class="header-section-number">7.2.1</span> A. Secrets de Fonctionnement
+(AWS Secrets Manager)</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Nom du Secret (AWS)</th>
+<th style="text-align: left;">Portée / Env</th>
+<th style="text-align: left;">Contenu / Clés</th>
+<th style="text-align: left;">Consommateur dans EKS</th>
+<th style="text-align: left;">Type de Stockage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>[env]/rhzorion/app-secrets</code></td>
+<td style="text-align: left;">Applicatif</td>
+<td style="text-align: left;"><code>database_host</code>,
+<code>database_user</code>, <code>database_password</code>,
+<code>jwt_secret_key</code></td>
+<td style="text-align: left;">Pods backend (via Secrets Store CSI
+Driver)</td>
+<td style="text-align: left;">Chiffré KMS centralisé</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Secret GitHub
+<code>DB_PASSWORD</code></td>
+<td style="text-align: left;">Déploiement</td>
+<td style="text-align: left;">Mot de passe administrateur de la base RDS
+(PostgreSQL)</td>
+<td style="text-align: left;">Pipeline de déploiement
+(<code>deploy.sh</code>)</td>
+<td style="text-align: left;">Secrets encryptés GitHub</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 data-number="7.3" id="matrice-de-flux-réseau-table-de-filtrage-conformité-anssi-r9"><span class="header-section-number">7.3</span> 🔄 3. Matrice de Flux Réseau
+&amp; Table de Filtrage (Conformité ANSSI R9)</h2>
+<p>Les flux réseau sont contrôlés de manière redondante : 1. Au niveau
+AWS via les <strong>Groupes de Sécurité (Security Groups)</strong>. 2.
+Au niveau Kubernetes via les <strong>Network Policies</strong>. 3. Au
+niveau de la périphérie cloud via <strong>AWS WAFv2</strong>.</p>
+<pre><code>[Utilisateur Externe]
+       │ (HTTPS/443)
+       ▼
+ [AWS WAFv2] (Filtrage)
+       │ (HTTPS/443)
+       ▼
+  [Ingress ALB] (VPC Public)
+       │ (HTTP/8080)
+       ▼
+ [Frontend Pod] (VPC Privé App)
+       │ (TCP/5000)
+       ▼
+  [Backend Pod] ──(TCP/5432)──► [RDS Database] (VPC Privé Data)
+       │
+       ├─(HTTPS/443)─► [VPC Endpoints / S3 Assets / Secrets Manager]
+       └─(HTTPS/443)─► [Amazon ECR]</code></pre>
+<h3 data-number="7.3.1" id="matrice-exhaustive-des-flux-réseau"><span class="header-section-number">7.3.1</span> Matrice Exhaustive des Flux
+Réseau :</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Source</th>
+<th style="text-align: left;">Destination</th>
+<th style="text-align: left;">Port</th>
+<th style="text-align: left;">Protocole</th>
+<th style="text-align: left;">Rôle / Description</th>
+<th style="text-align: left;">Mécanisme de Filtrage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Internet
+(Utilisateurs)</strong></td>
+<td style="text-align: left;"><strong>AWS WAFv2</strong></td>
+<td style="text-align: left;"><code>80</code>, <code>443</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Requêtes HTTP/HTTPS entrantes du
+public.</td>
+<td style="text-align: left;">AWS WAFv2 (Filtrage OWASP, Rate Limit,
+Geo-blocking)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>AWS WAFv2</strong></td>
+<td style="text-align: left;"><strong>Ingress ALB</strong></td>
+<td style="text-align: left;"><code>80</code>, <code>443</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Transmission des requêtes validées
+(propres).</td>
+<td style="text-align: left;">Security Group <code>alb</code> (Autorise
+uniquement le trafic HTTPS clean)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Ingress ALB</strong></td>
+<td style="text-align: left;"><strong>Frontend Pod</strong></td>
+<td style="text-align: left;"><code>8080</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Redirection du trafic web déchiffré vers
+Nginx.</td>
+<td style="text-align: left;">Security Group <code>app</code> &amp;
+<code>NetworkPolicy</code> (Namespace <code>rhorizon</code>)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Ingress ALB</strong></td>
+<td style="text-align: left;"><strong>Backend Pod</strong></td>
+<td style="text-align: left;"><code>5000</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Redirection directe des requêtes de l’API
+<code>/api/*</code>.</td>
+<td style="text-align: left;">Security Group <code>app</code> &amp;
+<code>NetworkPolicy</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Frontend Pod</strong></td>
+<td style="text-align: left;"><strong>Backend Pod</strong></td>
+<td style="text-align: left;"><code>5000</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Appels API internes du code Javascript
+client vers le Flask Backend.</td>
+<td style="text-align: left;"><code>NetworkPolicy</code> (Autorise
+uniquement si label <code>app: rhorizon-frontend</code>)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Backend Pod</strong></td>
+<td style="text-align: left;"><strong>RDS PostgreSQL</strong></td>
+<td style="text-align: left;"><code>5432</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Connexions et requêtes SQL à la base de
+données.</td>
+<td style="text-align: left;">Security Group <code>rds</code> (Autorise
+exclusivement le Security Group <code>app</code>)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>EKS Nodes / Pods</strong></td>
+<td style="text-align: left;"><strong>AWS Secrets Manager</strong></td>
+<td style="text-align: left;"><code>443</code></td>
+<td style="text-align: left;">TCP (HTTPS)</td>
+<td style="text-align: left;">Récupération des secrets par le
+<em>Secrets Store CSI Driver</em>.</td>
+<td style="text-align: left;">VPC Endpoint pour Secrets Manager
+(<code>com.amazonaws.[region].secretsmanager</code>)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>EKS Nodes / Pods</strong></td>
+<td style="text-align: left;"><strong>Amazon S3 (Assets)</strong></td>
+<td style="text-align: left;"><code>443</code></td>
+<td style="text-align: left;">TCP (HTTPS)</td>
+<td style="text-align: left;">Stockage et lecture de documents
+applicatifs.</td>
+<td style="text-align: left;">VPC Endpoint Gateway S3
+(<code>com.amazonaws.[region].s3</code>)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>EKS Nodes (Workers)</strong></td>
+<td style="text-align: left;"><strong>Amazon ECR</strong></td>
+<td style="text-align: left;"><code>443</code></td>
+<td style="text-align: left;">TCP (HTTPS)</td>
+<td style="text-align: left;">Récupération (pull) des images de
+conteneurs.</td>
+<td style="text-align: left;">VPC Endpoints pour ECR
+(<code>ecr.api</code> &amp; <code>ecr.dkr</code>)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>EKS Control Plane</strong></td>
+<td style="text-align: left;"><strong>EKS Nodes (Workers)</strong></td>
+<td style="text-align: left;"><code>10250</code>, <code>443</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Communication et pilotage des pods par
+Kubernetes.</td>
+<td style="text-align: left;">Security Group d’EKS (ENIs cross-account
+managées par AWS)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Metrics Server / HPA</strong></td>
+<td style="text-align: left;"><strong>EKS Nodes (Workers)</strong></td>
+<td style="text-align: left;"><code>10250</code>, <code>443</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Collecte des métriques CPU/RAM des pods
+pour l’Auto Scaling.</td>
+<td style="text-align: left;">Security Group d’EKS &amp;
+<code>NetworkPolicy</code> interne</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>CloudTrail (Master)</strong></td>
+<td style="text-align: left;"><strong>S3 Audit Logs
+(Shared)</strong></td>
+<td style="text-align: left;"><code>443</code></td>
+<td style="text-align: left;">TCP (HTTPS)</td>
+<td style="text-align: left;">Dépôt centralisé des logs d’API de
+l’organisation.</td>
+<td style="text-align: left;">S3 Bucket Policy (Restreint au principal
+<code>cloudtrail.amazonaws.com</code>)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Bastion / DevOps
+Admin</strong></td>
+<td style="text-align: left;"><strong>EKS Nodes / RDS</strong></td>
+<td style="text-align: left;"><code>443</code></td>
+<td style="text-align: left;">TCP</td>
+<td style="text-align: left;">Session d’administration sécurisée via AWS
+Systems Manager.</td>
+<td style="text-align: left;">AWS SSM Session Manager (Aucun port
+ouvert, flux sortant SSM Agent)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 data-number="7.4" id="gouvernance-droits-daccès-des-développeurs"><span class="header-section-number">7.4</span> 👥 4. Gouvernance &amp; Droits
+d’Accès des Développeurs</h2>
+<p>Pour garantir l’intégrité du code source de bout en bout, le workflow
+Git respecte les règles suivantes :</p>
+<ol type="1">
+<li><strong>Rôles des Développeurs</strong> :
+<ul>
+<li><strong>Développeurs (Rôle Read/Write)</strong> : Peuvent créer des
+branches de fonctionnalités (<code>feature/*</code>), pousser des
+commits signés, et soumettre des Pull Requests.</li>
+<li><strong>Relecteurs / Maintainers (Rôle Admin/Maintainer)</strong> :
+Seuls autorisés à fusionner (merge) le code vers la branche
+<code>main</code> après validation manuelle des tests unitaires et des
+scans de sécurité (Bandit, Checkov, Trivy).</li>
+</ul></li>
+<li><strong>Politique de Protection de Branche
+(<code>main</code>)</strong> :
+<ul>
+<li>Approbation par au moins un relecteur obligatoire.</li>
+<li>Passage obligatoire des vérifications de sécurité dans la CI/CD (y
+compris le scan des signatures de commits).</li>
+<li>Interdiction de faire du Force Push.</li>
+</ul></li>
+</ol>
+<h1 data-number="8" id="guide-de-développement-sécurisé-asd"><span class="header-section-number">8</span> Guide de Développement Sécurisé
+(ASD)</h1>
+<p>Ce document régit les règles et standards de développement sécurisé à
+respecter par l’ensemble des contributeurs du projet
+<strong>ASD</strong>, conformément aux exigences de la recommandation
+<strong>R7 de l’ANSSI</strong>.</p>
+<hr />
+<h2 data-number="8.1" id="prévention-des-injections-sql"><span class="header-section-number">8.1</span> 🛡️ 1. Prévention des Injections
+SQL</h2>
+<p>L’une des vulnérabilités les plus critiques est l’injection SQL. *
+<strong>Règle absolue</strong> : <strong>Ne jamais concaténer</strong>
+de variables ou de chaînes de caractères pour construire des requêtes
+SQL. * <strong>Bonne Pratique</strong> : Utiliser systématiquement les
+requêtes paramétrées fournies par le driver de base de données
+(<code>psycopg2</code>). Les valeurs utilisateur doivent être passées en
+tant que tuple de paramètres distinct.</p>
+<h3 data-number="8.1.1" id="mauvaise-pratique-vulnérable"><span class="header-section-number">8.1.1</span> ❌ Mauvaise Pratique
+(Vulnérable) :</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># VULNÉRABLE - N&#39;utilisez jamais cette syntaxe !</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>cur.execute(<span class="st">&quot;SELECT * FROM employees WHERE name = &#39;&quot;</span> <span class="op">+</span> data[<span class="st">&#39;name&#39;</span>] <span class="op">+</span> <span class="st">&quot;&#39;;&quot;</span>)</span></code></pre></div>
+<h3 data-number="8.1.2" id="bonne-pratique-sécurisée"><span class="header-section-number">8.1.2</span> Bonne Pratique (Sécurisée)
+:</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SÉCURISÉ - Paramétrage natif</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>cur.execute(<span class="st">&quot;SELECT * FROM employees WHERE name = </span><span class="sc">%s</span><span class="st">;&quot;</span>, (data[<span class="st">&#39;name&#39;</span>],))</span></code></pre></div>
+<hr />
+<h2 data-number="8.2" id="sécurisation-des-politiques-cors-cross-origin-resource-sharing"><span class="header-section-number">8.2</span> 🌐 2. Sécurisation des
+Politiques CORS (Cross-Origin Resource Sharing)</h2>
+<p>Pour empêcher des sites malveillants d’appeler notre API depuis le
+navigateur d’un utilisateur légitime : * <strong>Développement</strong>
+: L’origine wildcard (<code>*</code>) est autorisée par défaut dans
+l’environnement local. * <strong>Production</strong> : La politique CORS
+doit être restreinte aux domaines officiels du projet. Elle est
+configurée via la variable d’environnement
+<code>ALLOWED_CORS_ORIGINS</code>.</p>
+<h3 data-number="8.2.1" id="exemple-de-configuration"><span class="header-section-number">8.2.1</span> Exemple de configuration
+:</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Chargement des origines autorisées depuis l&#39;environnement</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>allowed_origins <span class="op">=</span> os.environ.get(<span class="st">&quot;ALLOWED_CORS_ORIGINS&quot;</span>, <span class="st">&quot;https://votre-domaine.xyz&quot;</span>).split(<span class="st">&quot;,&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>CORS(app, resources<span class="op">=</span>{<span class="vs">r&quot;/api/*&quot;</span>: {<span class="st">&quot;origins&quot;</span>: allowed_origins}})</span></code></pre></div>
+<hr />
+<h2 data-number="8.3" id="gestion-des-erreurs-et-fuites-dinformations"><span class="header-section-number">8.3</span> 🚨 3. Gestion des Erreurs et
+Fuites d’Informations</h2>
+<p>L’affichage de traces d’appels (stack traces) ou de messages
+d’erreurs internes détaillés (détails de connexion DB, structure des
+tables) fournit des indices précieux aux attaquants. *
+<strong>Règle</strong> : Les erreurs système internes doivent être
+journalisées avec un niveau <code>ERROR</code> côté serveur, mais
+renvoyer un message d’erreur générique et sécurisé à l’utilisateur.</p>
+<h3 data-number="8.3.1" id="mauvaise-pratique"><span class="header-section-number">8.3.1</span> ❌ Mauvaise Pratique :</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Renvoyer l&#39;erreur brute peut divulguer le mot de passe ou la structure SQL</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify({<span class="st">&quot;error&quot;</span>: <span class="bu">str</span>(e)}), <span class="dv">500</span></span></code></pre></div>
+<h3 data-number="8.3.2" id="bonne-pratique"><span class="header-section-number">8.3.2</span> Bonne Pratique :</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    logger.error(<span class="ss">f&quot;Error updating employee: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">&quot;</span>) <span class="co"># Log complet interne</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify({<span class="st">&quot;error&quot;</span>: <span class="st">&quot;Failed to update employee&quot;</span>}), <span class="dv">500</span> <span class="co"># Message générique externe</span></span></code></pre></div>
+<hr />
+<h2 data-number="8.4" id="durcissement-des-images-docker-privilèges"><span class="header-section-number">8.4</span> 🐳 4. Durcissement des Images
+Docker &amp; Privilèges</h2>
+<ul>
+<li><p><strong>Images Minimales</strong> : Toujours privilégier des
+images de base allégées (ex: <code>-slim</code>, <code>-alpine</code> ou
+<code>distroless</code>) afin de réduire la surface d’attaque et le
+nombre de packages vulnérables pré-installés.</p></li>
+<li><p><strong>Utilisateur Non-Root</strong> : Ne jamais exécuter un
+conteneur en tant que <code>root</code>. Un utilisateur non-privilégié
+doit être explicitement créé et déclaré dans le Dockerfile :</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">useradd</span> <span class="at">-u</span> 10001 appuser <span class="kw">&amp;&amp;</span> <span class="fu">chown</span> <span class="at">-R</span> appuser:appuser /app</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">USER</span> appuser</span></code></pre></div></li>
+</ul>
+<hr />
+<h2 data-number="8.5" id="outils-danalyse-statique-sast-locaux"><span class="header-section-number">8.5</span> 🔍 5. Outils d’Analyse Statique
+(SAST) Locaux</h2>
+<p>Avant de pousser vos modifications sur Git, il est recommandé de
+lancer les analyseurs de sécurité en local : 1. <strong>Sécurité Python
+(Bandit)</strong> :
+<code>bash    pip install bandit    bandit -r app/backend/ -ll</code> 2.
+<strong>Scan de Fichiers &amp; Secrets (Trivy)</strong> :
+<code>bash    trivy fs app/frontend/</code></p>
+<h1 data-number="9" id="documentation-technique-des-modules"><span class="header-section-number">9</span> Documentation Technique des
+Modules</h1>
+<p>Ce chapitre détaille la configuration technique, les variables et les
+enjeux de sécurité pour chaque module Terraform du projet.</p>
+</body>
+</html>

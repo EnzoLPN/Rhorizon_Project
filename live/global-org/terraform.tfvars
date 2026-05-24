@@ -1,5 +1,7 @@
+project_name       = "rhorizon"
 shared_services_email = "enzo.loppin+shared@gmail.com"
 nonprod_email         = "enzo.loppin+nonprod@gmail.com"
 prod_email            = "enzo.loppin+prod@gmail.com"
 aws_profile           = "aws-master"
 aws_region            = "eu-west-1"
+

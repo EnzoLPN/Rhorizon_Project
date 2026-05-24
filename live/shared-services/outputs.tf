@@ -55,7 +55,12 @@ output "ecr_repository_arns" {
 }
 
 # --- Outputs CI/CD Infra ---
-output "gitlab_role_arn" {
-  value       = module.cicd_infra.gitlab_role_arn
-  description = "ARN du role IAM a faire endosser par le runner GitLab CI/CD"
+output "github_actions_nonprod_role_arn" {
+  value       = module.cicd_infra.github_actions_nonprod_role_arn
+  description = "ARN du role IAM Non-Prod a faire endosser par le runner"
+}
+
+output "github_actions_prod_role_arn" {
+  value       = module.cicd_infra.github_actions_prod_role_arn
+  description = "ARN du role IAM Prod a faire endosser par le runner"
 }

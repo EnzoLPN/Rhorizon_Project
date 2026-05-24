@@ -20,6 +20,7 @@ module "network" {
   enable_phz               = true
   private_domain_name      = var.private_domain_name
   enable_vpc_endpoints     = false
+  project_name             = var.project_name
 }
 
 # --- 2. Module Base de Données RDS (PostgreSQL) ---
@@ -34,7 +35,7 @@ module "rds" {
   allocated_storage     = 20
   max_allocated_storage = 50
 
-  db_name        = "rhorizon_dev"
+  db_name        = "${var.project_name}_dev"
   admin_username = "dbadmin"
   admin_password = var.db_admin_password
 
@@ -43,6 +44,7 @@ module "rds" {
   deletion_protection     = false
   skip_final_snapshot     = true
   storage_encrypted       = true
+  project_name            = var.project_name
 }
 
 # --- 3. Module Cluster EKS ---
@@ -57,6 +59,12 @@ module "eks_cluster" {
   desired_size       = var.eks_desired_size
   min_size           = var.eks_min_size
   max_size           = var.eks_max_size
+
+  admin_roles = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/OrganizationAccountAccessRole",
+    data.terraform_remote_state.shared.outputs.github_actions_nonprod_role_arn
+  ]
+  project_name = var.project_name
 }
 
 # --- 4. Module DNS et Ingress (Route53 public + ACM + WAF) ---
@@ -67,6 +75,7 @@ module "dns_ingress" {
   domain_name               = var.domain_name
   create_public_zone        = true
   enable_extended_waf_rules = false
+  project_name              = var.project_name
 }
 
 # --- 5. Module Gestion des Secrets (CSI Driver + IRSA) ---
@@ -78,7 +87,8 @@ module "secrets_management" {
   oidc_provider_arn = module.eks_cluster.oidc_provider_arn
   kms_key_arn       = data.terraform_remote_state.shared.outputs.kms_assets_key_arn
 
-  depends_on = [module.eks_cluster]
+  depends_on   = [module.eks_cluster]
+  project_name = var.project_name
 }
 
 # --- 5b. Module AWS Load Balancer Controller ---
@@ -92,7 +102,8 @@ module "aws_load_balancer_controller" {
   vpc_id            = module.network.vpc_id
   aws_region        = var.aws_region
 
-  depends_on = [module.eks_cluster]
+  depends_on   = [module.eks_cluster]
+  project_name = var.project_name
 }
 
 # --- 6. Module Observabilité (Prometheus Stack + Grafana + Fluent Bit) ---
@@ -110,7 +121,8 @@ module "observability" {
   acm_certificate_arn     = module.dns_ingress.acm_certificate_arn
   waf_web_acl_arn         = module.dns_ingress.waf_web_acl_arn
 
-  depends_on = [module.eks_cluster, module.aws_load_balancer_controller]
+  depends_on   = [module.eks_cluster, module.aws_load_balancer_controller]
+  project_name = var.project_name
 }
 
 # --- 7. Delegation Route53 automatique de nonprod.rhorizon.xyz dans la zone parente (compte shared) ---
@@ -128,23 +140,6 @@ resource "aws_route53_record" "nonprod_delegation" {
   records  = module.dns_ingress.route53_zone_name_servers
 }
 
-# --- 8. Enregistrement DNS Route53 pour Grafana ---
-data "kubernetes_ingress_v1" "grafana" {
-  metadata {
-    name      = "kube-prometheus-stack-grafana"
-    namespace = "monitoring"
-  }
-  depends_on = [module.observability]
-}
-
-resource "aws_route53_record" "grafana" {
-  zone_id = module.dns_ingress.route53_zone_id
-  name    = "grafana.${var.domain_name}"
-  type    = "CNAME"
-  ttl     = 300
-  records = [data.kubernetes_ingress_v1.grafana.status[0].load_balancer[0].ingress[0].hostname]
-}
-
 # --- 9. Module Bastion SSM (Accès RDS sécurisé) ---
 module "ssm_bastion" {
   source = "../../modules/ssm-bastion"
@@ -153,6 +148,7 @@ module "ssm_bastion" {
   vpc_id                = module.network.vpc_id
   subnet_id             = module.network.private_subnet_ids[0]
   rds_security_group_id = module.network.rds_security_group_id
+  project_name          = var.project_name
 }
 
 # --- 10. Rôle IAM et Politique pour IRSA (Accès S3 du Backend) ---
@@ -164,6 +160,7 @@ resource "aws_iam_policy" "backend_s3_access" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "S3Access"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
@@ -177,6 +174,7 @@ resource "aws_iam_policy" "backend_s3_access" {
         ]
       },
       {
+        Sid    = "KMSAccess"
         Effect = "Allow"
         Action = [
           "kms:Decrypt",
@@ -189,7 +187,7 @@ resource "aws_iam_policy" "backend_s3_access" {
 }
 
 resource "aws_iam_role" "backend_s3_role" {
-  name = "rhorizon-${var.environment}-backend-s3-role"
+  name = "${var.project_name}-${var.environment}-backend-s3-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -202,7 +200,7 @@ resource "aws_iam_role" "backend_s3_role" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(module.eks_cluster.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:rhorizon:rhorizon-backend-sa"
+            "${replace(module.eks_cluster.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:${var.project_name}:${var.project_name}-backend-sa"
           }
         }
       }
@@ -226,7 +224,5 @@ resource "aws_security_group_rule" "rds_ingress_from_eks_cluster" {
   description              = "Autoriser le trafic PostgreSQL depuis EKS (Cluster SG)"
 }
 
-
-
-
-
+# --- 12. Identité appelante ---
+data "aws_caller_identity" "current" {}

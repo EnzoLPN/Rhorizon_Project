@@ -1,0 +1,13 @@
+apiVersion: kyverno.io/v2beta1
+kind: ClusterImagePolicy
+metadata:
+  name: verify-rhorizon-images
+  annotations:
+    description: "Enforces that all images matching the rhzorion ECR pattern are cryptographically signed by our Cosign public key."
+spec:
+  imagePatterns:
+    - "116101833976.dkr.ecr.*.amazonaws.com/rhorizon/*"
+  verification:
+    - type: cosign
+      key: |-
+${COSIGN_PUBLIC_KEY}

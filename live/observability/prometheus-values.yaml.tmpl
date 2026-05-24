@@ -1,0 +1,50 @@
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      ${PROMETHEUS_STORAGE_SPEC}
+    resources:
+      requests:
+        cpu: "${PROMETHEUS_REQ_CPU}"
+        memory: "${PROMETHEUS_REQ_MEM}"
+      limits:
+        cpu: "${PROMETHEUS_LIM_CPU}"
+        memory: "${PROMETHEUS_LIM_MEM}"
+
+grafana:
+  ingress:
+    enabled: ${GRAFANA_INGRESS_ENABLED}
+    ingressClassName: alb
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/healthcheck-path: /api/health
+      alb.ingress.kubernetes.io/certificate-arn: "${ACM_CERTIFICATE_ARN}"
+      alb.ingress.kubernetes.io/waf-acl-arn: "${WAF_WEB_ACL_ARN}"
+    hosts:
+      - "${GRAFANA_DOMAIN_NAME}"
+    path: /
+
+  persistence:
+    enabled: ${GRAFANA_PERSISTENCE_ENABLED}
+    storageClassName: gp3-encrypted
+    size: 10Gi
+
+  resources:
+    requests:
+      cpu: "${GRAFANA_REQ_CPU}"
+      memory: "${GRAFANA_REQ_MEM}"
+    limits:
+      cpu: "${GRAFANA_LIM_CPU}"
+      memory: "${GRAFANA_LIM_MEM}"
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: "${ALERTMANAGER_REQ_CPU}"
+        memory: "${ALERTMANAGER_REQ_MEM}"
+      limits:
+        cpu: "${ALERTMANAGER_LIM_CPU}"
+        memory: "${ALERTMANAGER_LIM_MEM}"

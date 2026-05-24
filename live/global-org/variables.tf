@@ -24,3 +24,9 @@ variable "prod_email" {
   type        = string
   description = "E-mail unique pour le compte prod"
 }
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

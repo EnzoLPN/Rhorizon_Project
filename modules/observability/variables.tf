@@ -52,3 +52,9 @@ variable "waf_web_acl_arn" {
   description = "ARN du Web ACL WAFv2 regional pour securiser l Ingress Grafana"
   default     = ""
 }
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

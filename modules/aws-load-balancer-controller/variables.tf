@@ -28,3 +28,9 @@ variable "aws_region" {
   description = "Région AWS"
   default     = "eu-west-1"
 }
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

@@ -52,6 +52,7 @@ jobs:
   build:
     name: Backend Build & Push
     needs: validate
+    environment: NON_PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
@@ -67,8 +68,8 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
-          aws-region: eu-west-1
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         id: login-ecr
@@ -77,8 +78,8 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: 116101833976.dkr.ecr.eu-west-1.amazonaws.com
-          ECR_REPOSITORY: rhzorion/backend
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
           SHA_SHORT: ${{ steps.vars.outputs.sha_short }}
         run: |
           TAG="${SHA_SHORT}-$(date +%Y%m%d-%H%M%S)"
@@ -86,33 +87,57 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG ./app/backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Sign Docker Image with Cosign
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          IMAGE_URI: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_BACKEND_REPOSITORY }}:${{ steps.build-image.outputs.tag }}
+        run: |
+          if [ -n "$COSIGN_PRIVATE_KEY" ]; then
+            echo "Signing backend image with Cosign..."
+            cosign sign --yes --key env://COSIGN_PRIVATE_KEY "$IMAGE_URI"
+          else
+            echo "⚠️ Warning: COSIGN_PRIVATE_KEY is not set. Skipping signature."
+          fi
+
   scan:
     name: Backend Container Scan
     needs: build
+    environment: NON_PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
-          aws-region: eu-west-1
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Pull image from ECR
+        env:
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
         run: |
-          docker pull 116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/backend:${{ needs.build.outputs.image_tag }}
+          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.build.outputs.image_tag }}
 
       - name: Scan Image with Trivy
+        env:
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/backend:${{ needs.build.outputs.image_tag }}
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.build.outputs.image_tag }}
 
   deploy:
     name: Backend Deploy to EKS Nonprod
     needs: [build, scan]
+    environment: NON_PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -122,23 +147,37 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
-          aws-region: eu-west-1
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Assume Cross-Account Nonprod Role
         run: |
-          ASSUME_OUTPUT=$(aws sts assume-role --role-arn "arn:aws:iam::083127296598:role/OrganizationAccountAccessRole" --role-session-name "EKSBackendDeploy" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+          ASSUME_OUTPUT=$(aws sts assume-role --role-arn "${{ vars.AWS_NONPROD_ROLE_ARN }}" --role-session-name "EKSBackendDeploy" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
           echo "AWS_ACCESS_KEY_ID=$(echo "$ASSUME_OUTPUT" | awk '{print $1}')" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=$(echo "$ASSUME_OUTPUT" | awk '{print $2}')" >> $GITHUB_ENV
           echo "AWS_SESSION_TOKEN=$(echo "$ASSUME_OUTPUT" | awk '{print $3}')" >> $GITHUB_ENV
 
       - name: Update Kubeconfig
         run: |
-          aws eks update-kubeconfig --name nonprod-eks-cluster --region eu-west-1
+          aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
 
       - name: Deploy to EKS
         env:
           IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_NAME: ${{ vars.DB_NAME }}
+          DB_USER: ${{ vars.DB_USER }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          BACKEND_ROLE_ARN: ${{ vars.BACKEND_ROLE_ARN }}
+          ACM_CERT_ARN: ${{ vars.ACM_CERT_ARN }}
+          WAF_ACL_ARN: ${{ vars.WAF_ACL_ARN }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          PROJECT_NAME: ${{ vars.PROJECT_NAME }}
         run: |
-          kubectl set image deployment/rhorizon-backend backend=116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/backend:$IMAGE_TAG -n rhorizon
-          kubectl rollout status deployment/rhorizon-backend -n rhorizon --timeout=120s
+          echo "🔐 Fetching database password from AWS Secrets Manager..."
+          DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/nonprod/rds/db-admin-password --query SecretString --output text)
+          export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
+          ./app/k8s/deploy.sh backend

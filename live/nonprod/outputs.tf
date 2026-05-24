@@ -59,4 +59,15 @@ output "waf_web_acl_arn" {
   description = "ARN du Web ACL WAFv2 régional pour l'Ingress"
 }
 
+output "fluent_bit_role_arn" {
+  value       = module.observability.fluent_bit_role_arn
+  description = "ARN du role IAM attribue a Fluent Bit (IRSA)"
+}
 
+
+
+
+output "backend_role_arn" {
+  value       = aws_iam_role.backend_s3_role.arn
+  description = "ARN du role IAM attribue au Backend pour l'accès S3/KMS (IRSA)"
+}

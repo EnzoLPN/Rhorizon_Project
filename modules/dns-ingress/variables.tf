@@ -19,3 +19,9 @@ variable "enable_extended_waf_rules" {
   description = "Activer les regles de protection WAFv2 etendues (recommande pour la prod)"
   default     = false
 }
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

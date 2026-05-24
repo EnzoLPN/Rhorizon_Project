@@ -60,3 +60,9 @@ variable "private_domain_name" {
   description = "Nom de domaine de la zone DNS privee"
   default     = "rhorizon.local"
 }
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

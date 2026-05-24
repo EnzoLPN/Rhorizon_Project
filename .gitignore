@@ -1,39 +1,46 @@
-# Local environment files
+# --- Secrets & Local Config ---
 .env
 .env.*
 !.env.example
+cosign.key
+cosign.pub
+*.pem
+*.key
+*.pub
 
-# Python
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+
+# --- Kubernetes / Helm ---
+app/k8s/generated/
+observability/generated/
+*.log
+
+# --- Python ---
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.venv/
+*.py[cod]
+*.class
+.venv
 venv/
 ENV/
 .pytest_cache/
 
-# Terraform / Terragrunt
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-*.tfvars
-!terraform.tfvars
-tfplan
-tfplan.*
-.terragrunt-cache/
-
-# Kubernetes
-kubeconfig
-*.kubeconfig
-
-# IDEs
+# --- OS / IDE ---
+.DS_Store
 .idea/
 .vscode/
 *.swp
-*.swo
+*~
+.~lock.*
 
-# OS
-.DS_Store
-Thumbs.db
+# --- Temp / Binaries ---
+dist/
+build/
+bin/
+cosign
+pandoc

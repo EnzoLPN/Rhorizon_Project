@@ -42,3 +42,15 @@ variable "max_size" {
   description = "Nombre maximal de noeuds dans le groupe"
   default     = 3
 }
+
+variable "admin_roles" {
+  type        = list(string)
+  description = "Liste des ARN de rôles IAM à qui donner les droits cluster-admin via EKS Access Entries"
+  default     = []
+}
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

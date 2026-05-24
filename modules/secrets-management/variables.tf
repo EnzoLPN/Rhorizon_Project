@@ -18,3 +18,9 @@ variable "kms_key_arn" {
   description = "ARN de la cle KMS pour chiffrer les secrets"
   default     = null
 }
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

@@ -3,14 +3,32 @@ variable "environment" {
   description = "Nom de l'environnement (ex: shared)"
 }
 
-variable "gitlab_organization" {
+
+variable "github_organization" {
   type        = string
-  description = "Nom de l'organisation ou du groupe GitLab (ex: rhzorion-org)"
-  default     = "rhzorion-org"
+  description = "Nom de l'organisation ou utilisateur GitHub (ex: EnzoLPN)"
+  default     = "EnzoLPN"
 }
 
-variable "gitlab_project" {
+variable "github_project" {
   type        = string
-  description = "Nom du projet/depot GitLab (ex: infrastructure)"
-  default     = "infrastructure"
+  description = "Nom du projet/depot GitHub (ex: Rhorizon_Project)"
+  default     = "Rhorizon_Project"
+}
+
+variable "nonprod_account_id" {
+  type        = string
+  description = "ID du compte AWS Non-Prod"
+}
+
+variable "prod_account_id" {
+  type        = string
+  description = "ID du compte AWS Prod"
+}
+
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
 }

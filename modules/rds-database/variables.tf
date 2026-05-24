@@ -45,9 +45,11 @@ variable "admin_username" {
 
 variable "admin_password" {
   type        = string
-  description = "Mot de passe de l'administrateur de la base de donnees (sensible)"
+  description = "Mot de passe administrateur (obsolète, géré via Secrets Manager)"
   sensitive   = true
+  default     = null
 }
+
 
 variable "multi_az" {
   type        = bool
@@ -83,4 +85,10 @@ variable "skip_final_snapshot" {
   type        = bool
   description = "Passer la creation du snapshot final lors de la destruction"
   default     = true
+}
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
 }

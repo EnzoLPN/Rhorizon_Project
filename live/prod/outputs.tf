@@ -40,3 +40,14 @@ output "ssm_bastion_tunnel_command" {
   description = "Commande pour ouvrir un tunnel local sécurisé vers la base RDS"
 }
 
+output "waf_web_acl_arn" {
+  value       = module.dns_ingress.waf_web_acl_arn
+  description = "ARN du Web ACL WAFv2 regional pour l'Ingress"
+}
+
+output "fluent_bit_role_arn" {
+  value       = module.observability.fluent_bit_role_arn
+  description = "ARN du role IAM attribue a Fluent Bit (IRSA)"
+}
+
+

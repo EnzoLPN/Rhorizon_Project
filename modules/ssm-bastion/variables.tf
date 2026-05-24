@@ -17,3 +17,9 @@ variable "rds_security_group_id" {
   type        = string
   description = "ID du Security Group de la base de données RDS à laquelle le bastion doit avoir accès"
 }
+
+variable "project_name" {
+  type        = string
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
+}

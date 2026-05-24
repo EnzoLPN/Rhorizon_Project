@@ -17,8 +17,20 @@ permissions:
   contents: read
 
 jobs:
+  validate:
+    name: Frontend Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy FS Scan (Security & Secret Detection)
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/apps aquasec/trivy:latest fs --severity HIGH,CRITICAL --exit-code 1 /apps/app/frontend
+
   build:
     name: Frontend Build & Push
+    needs: validate
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
@@ -34,8 +46,8 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
-          aws-region: eu-west-1
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         id: login-ecr
@@ -44,14 +56,30 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: 116101833976.dkr.ecr.eu-west-1.amazonaws.com
-          ECR_REPOSITORY: rhzorion/frontend
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
           SHA_SHORT: ${{ steps.vars.outputs.sha_short }}
         run: |
           TAG="${SHA_SHORT}-$(date +%Y%m%d-%H%M%S)"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG ./app/frontend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Sign Docker Image with Cosign
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          IMAGE_URI: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_FRONTEND_REPOSITORY }}:${{ steps.build-image.outputs.tag }}
+        run: |
+          if [ -n "$COSIGN_PRIVATE_KEY" ]; then
+            echo "Signing frontend image with Cosign..."
+            cosign sign --yes --key env://COSIGN_PRIVATE_KEY "$IMAGE_URI"
+          else
+            echo "⚠️ Warning: COSIGN_PRIVATE_KEY is not set. Skipping signature."
+          fi
 
   scan:
     name: Frontend Container Scan
@@ -62,20 +90,26 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
-          aws-region: eu-west-1
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Pull image from ECR
+        env:
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
         run: |
-          docker pull 116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/frontend:${{ needs.build.outputs.image_tag }}
+          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.build.outputs.image_tag }}
 
       - name: Scan Image with Trivy
+        env:
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/frontend:${{ needs.build.outputs.image_tag }}
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.build.outputs.image_tag }}
 
   deploy:
     name: Frontend Deploy to EKS Nonprod
@@ -89,23 +123,29 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::116101833976:role/shared-gitlab-ci-role
-          aws-region: eu-west-1
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Assume Cross-Account Nonprod Role
         run: |
-          ASSUME_OUTPUT=$(aws sts assume-role --role-arn "arn:aws:iam::083127296598:role/OrganizationAccountAccessRole" --role-session-name "EKSFrontendDeploy" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+          ASSUME_OUTPUT=$(aws sts assume-role --role-arn "${{ vars.AWS_NONPROD_ROLE_ARN }}" --role-session-name "EKSFrontendDeploy" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
           echo "AWS_ACCESS_KEY_ID=$(echo "$ASSUME_OUTPUT" | awk '{print $1}')" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=$(echo "$ASSUME_OUTPUT" | awk '{print $2}')" >> $GITHUB_ENV
           echo "AWS_SESSION_TOKEN=$(echo "$ASSUME_OUTPUT" | awk '{print $3}')" >> $GITHUB_ENV
 
       - name: Update Kubeconfig
         run: |
-          aws eks update-kubeconfig --name nonprod-eks-cluster --region eu-west-1
+          aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
 
       - name: Deploy to EKS
         env:
           IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_FRONTEND_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
+          ACM_CERT_ARN: ${{ vars.ACM_CERT_ARN }}
+          WAF_ACL_ARN: ${{ vars.WAF_ACL_ARN }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
         run: |
-          kubectl set image deployment/rhorizon-frontend frontend=116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhzorion/frontend:$IMAGE_TAG -n rhorizon
-          kubectl rollout status deployment/rhorizon-frontend -n rhorizon --timeout=120s
+          ./app/k8s/deploy.sh frontend
+
