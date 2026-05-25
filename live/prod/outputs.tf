@@ -50,4 +50,9 @@ output "fluent_bit_role_arn" {
   description = "ARN du role IAM attribue a Fluent Bit (IRSA)"
 }
 
+output "app_role_arn" {
+  value       = module.eks_cluster.irsa_role_arns["app"]
+  description = "ARN du role IAM attribue à l'application unifiée pour l'accès S3/KMS (IRSA)"
+}
+
 
