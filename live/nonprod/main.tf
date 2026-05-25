@@ -82,9 +82,9 @@ module "eks_cluster" {
 
   # Configuration des rôles IRSA pour les workloads
   irsa_roles = {
-    backend = {
-      role_name       = "${var.project_name}-${var.environment}-backend-s3-role"
-      service_account = "${var.project_name}-backend-sa"
+    app = {
+      role_name       = "${var.project_name}-${var.environment}-app-s3-role"
+      service_account = "${var.project_name}-app-sa"
       namespace       = var.project_name
       policy_json     = jsonencode({
         Version = "2012-10-17"

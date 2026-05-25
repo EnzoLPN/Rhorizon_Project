@@ -17,7 +17,7 @@ module "shared_ecr" {
   source = "../../modules/shared-ecr"
 
   environment      = "shared"
-  repository_names = ["${var.project_name}/frontend", "${var.project_name}/backend"]
+  repository_names = ["${var.project_name}/app"]
   kms_key_arn      = module.shared_core.kms_assets_key_arn
 
   # Autorisation de pull cross-account pour les comptes applicatifs (Non-Prod & Prod)
