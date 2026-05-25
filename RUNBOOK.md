@@ -48,14 +48,15 @@ Dans votre dépôt GitHub, configurez les **Repository Variables** suivantes (`S
 | `ECR_REGISTRY` | `<ID_ACCOUNT_SHARED>.dkr.ecr.<REGION>.amazonaws.com` |
 | `EKS_CLUSTER_NAME` | Nom du cluster (ex: `rhorizon-nonprod-eks-cluster`) |
 | `DOMAIN_NAME` | Votre domaine (ex: `nonprod.rhorizon.xyz`) |
-| `ACM_CERT_ARN` | ARN du certificat ACM (voir outputs terraform) |
-| `WAF_ACL_ARN` | ARN du Web ACL WAF (voir outputs terraform) |
-| `DB_HOST` | Endpoint RDS (voir outputs terraform) |
+| `ACM_CERT_ARN` | ARN du certificat ACM |
+| `WAF_ACL_ARN` | ARN du Web ACL WAF |
+| `DB_HOST` | Endpoint RDS |
 | `DB_NAME` | `rhorizon_dev` |
 | `DB_USER` | `dbadmin` |
-| `S3_BUCKET_NAME` | Nom du bucket assets (voir outputs terraform) |
-| `AWS_ROLE_ARN` | ARN du rôle OIDC dans le compte **Shared** |
-| `AWS_NONPROD_ROLE_ARN` | ARN du rôle de déploiement dans le compte **Non-Prod** |
+| `S3_BUCKET_NAME` | Nom du bucket assets |
+| `AWS_ROLE_ARN` | ARN du rôle OIDC dans le compte Shared |
+| `AWS_NONPROD_ROLE_ARN` | ARN du rôle de déploiement dans le compte Non-Prod |
+| `APP_ROLE_ARN` | ARN du rôle IAM IRSA pour l'application (S3/RDS) |
 
 ## 🚀 4. Déploiement Applicatif
 
