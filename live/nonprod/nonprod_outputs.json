@@ -1,0 +1,76 @@
+{
+  "acm_certificate_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:acm:eu-west-1:083127296598:certificate/15a8e713-6109-44ca-ba32-7a4bb2621fb2"
+  },
+  "backend_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::083127296598:role/rhorizon-nonprod-backend-s3-role"
+  },
+  "cluster_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://0474D83FEA3D3DDE1FF468504755C915.gr7.eu-west-1.eks.amazonaws.com"
+  },
+  "cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "rhorizon-nonprod-eks-cluster"
+  },
+  "fluent_bit_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::083127296598:role/nonprod-eks-fluent-bit-role"
+  },
+  "oidc_provider_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::083127296598:oidc-provider/oidc.eks.eu-west-1.amazonaws.com/id/0474D83FEA3D3DDE1FF468504755C915"
+  },
+  "private_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-02a0d6f5d3798889e",
+      "subnet-047c183dc7c51adb6"
+    ]
+  },
+  "rds_endpoint": {
+    "sensitive": true,
+    "type": "string",
+    "value": "rhorizon-nonprod-postgres.c5g6kca8wtnj.eu-west-1.rds.amazonaws.com:5432"
+  },
+  "route53_zone_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "Z0887843EPX93JS4J01P"
+  },
+  "ssm_bastion_instance_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "i-059ce69813cea315f"
+  },
+  "ssm_bastion_tunnel_command": {
+    "sensitive": false,
+    "type": "string",
+    "value": "aws ssm start-session --target i-059ce69813cea315f --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters '{\"host\":[\"rhorizon-nonprod-postgres.c5g6kca8wtnj.eu-west-1.rds.amazonaws.com\"],\"portNumber\":[\"5432\"],\"localPortNumber\":[\"5432\"]}' --profile aws-nonprod --region eu-west-1"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0163eb192871372df"
+  },
+  "waf_web_acl_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:wafv2:eu-west-1:083127296598:regional/webacl/rhorizon-nonprod-ingress-waf/8060b42a-44bc-495e-b523-ef106ee8975f"
+  }
+}

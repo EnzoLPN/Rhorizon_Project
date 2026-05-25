@@ -1,0 +1,85 @@
+{
+  "bucket_assets_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::rhorizon-app-assets"
+  },
+  "bucket_assets_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "rhorizon-app-assets"
+  },
+  "bucket_backups_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::rhorizon-central-backups"
+  },
+  "bucket_backups_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "rhorizon-central-backups"
+  },
+  "bucket_logs_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::rhorizon-audit-logs"
+  },
+  "bucket_logs_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "rhorizon-audit-logs"
+  },
+  "ecr_repository_arns": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "rhorizon/backend": "string",
+        "rhorizon/frontend": "string"
+      }
+    ],
+    "value": {
+      "rhorizon/backend": "arn:aws:ecr:eu-west-1:116101833976:repository/rhorizon/backend",
+      "rhorizon/frontend": "arn:aws:ecr:eu-west-1:116101833976:repository/rhorizon/frontend"
+    }
+  },
+  "ecr_repository_urls": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "rhorizon/backend": "string",
+        "rhorizon/frontend": "string"
+      }
+    ],
+    "value": {
+      "rhorizon/backend": "116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhorizon/backend",
+      "rhorizon/frontend": "116101833976.dkr.ecr.eu-west-1.amazonaws.com/rhorizon/frontend"
+    }
+  },
+  "github_actions_nonprod_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::116101833976:role/shared-github-actions-nonprod-role"
+  },
+  "github_actions_prod_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::116101833976:role/shared-github-actions-prod-role"
+  },
+  "kms_assets_key_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:kms:eu-west-1:116101833976:key/331748f7-769c-42ab-a70d-ae596a7281b5"
+  },
+  "kms_backups_key_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:kms:eu-west-1:116101833976:key/9d57469e-1a50-4ebe-8d8e-a1ab4b499447"
+  },
+  "kms_logs_key_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:kms:eu-west-1:116101833976:key/5bf1157f-2d7e-4512-b370-70dc406dc8c8"
+  }
+}
