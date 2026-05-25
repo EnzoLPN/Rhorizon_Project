@@ -263,3 +263,4 @@ jobs:
           aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch "{
             \"Changes\": [{\"Action\": \"UPSERT\", \"ResourceRecordSet\": {\"Name\": \"${DOMAIN_NAME}.\", \"Type\": \"A\", \"AliasTarget\": {\"HostedZoneId\": \"Z32O12XQLNTSW2\", \"DNSName\": \"${ALB_HOSTNAME}.\", \"EvaluateTargetHealth\": false}}}]
           }"
+# Trigger Deployment
