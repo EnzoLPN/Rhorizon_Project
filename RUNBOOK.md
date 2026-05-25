@@ -92,13 +92,17 @@ Une fois l'infrastructure prête, renseignez les variables dans GitHub (`Setting
 
 ## 🚀 4. Déploiement Applicatif
 
-Le déploiement est **100% automatisé**. Dès qu'un `push` est détecté sur `main`, GitHub :
-1.  Build l'image unifiée.
-2.  La scanne (Trivy).
-3.  La pousse sur ECR.
-4.  Met à jour les manifests K8s sur EKS.
-5.  Met à jour le DNS Route 53.
+Le déploiement en **Non-Prod** est 100% automatisé à chaque `push`.
 
----
+### Déploiement en Production (Activation)
+Par défaut, le job de production est désactivé dans `.github/workflows/main.yml`. Pour l'activer :
+1.  **Décommentez** le job `deployment-prod` dans le fichier `.github/workflows/main.yml`.
+2.  **Configurez l'approbation manuelle :**
+    *   Allez dans `Settings > Environments` sur GitHub.
+    *   Créez un environnement nommé `PROD`.
+    *   Activez **Required reviewers** et ajoutez votre compte. Cela forcera une validation manuelle avant que le déploiement ne commence.
+3.  **Variables Prod :** Assurez-vous que les variables `AWS_PROD_ROLE_ARN`, `DOMAIN_PROD_NAME`, etc., sont bien configurées.
+
+### Vérification Manuelle
 ## 🔄 5. Maintenance
 Pour toute modification d'infrastructure, utilisez toujours `terraform apply` depuis le dossier correspondant. Pour l'application, modifiez le code dans `app/` et poussez sur GitHub.

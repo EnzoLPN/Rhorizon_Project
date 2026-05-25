@@ -182,4 +182,78 @@ jobs:
           aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch "{
             \"Changes\": [{\"Action\": \"UPSERT\", \"ResourceRecordSet\": {\"Name\": \"${DOMAIN_NAME}.\", \"Type\": \"A\", \"AliasTarget\": {\"HostedZoneId\": \"Z32O12XQLNTSW2\", \"DNSName\": \"${ALB_HOSTNAME}.\", \"EvaluateTargetHealth\": false}}}]
           }"
+
+  ##############################################################################
+  # JOB DE PRODUCTION (DÉSACTIVÉ)
+  # Pour activer : Supprimez les '#' devant les lignes ci-dessous.
+  # Note : Nécessite un environnement 'PROD' configuré dans GitHub avec 'Required Reviewers'.
+  ##############################################################################
+  # deployment-prod:
+  #   name: 🏁 Continuous Deployment (Prod)
+  #   needs: deployment-nonprod
+  #   environment: PROD  # <--- Gère l'approbation manuelle via GitHub
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+  #         aws-region: ${{ vars.AWS_REGION }}
+  #
+  #     - name: Assume Cross-Account Role (Prod)
+  #       run: |
+  #         ASSUME_OUTPUT=$(aws sts assume-role --role-arn "${{ vars.AWS_PROD_ROLE_ARN }}" --role-session-name "EKSDeployProd" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+  #         echo "AWS_ACCESS_KEY_ID=$(echo "$ASSUME_OUTPUT" | awk '{print $1}')" >> $GITHUB_ENV
+  #         echo "AWS_SECRET_ACCESS_KEY=$(echo "$ASSUME_OUTPUT" | awk '{print $2}')" >> $GITHUB_ENV
+  #         echo "AWS_SESSION_TOKEN=$(echo "$ASSUME_OUTPUT" | awk '{print $3}')" >> $GITHUB_ENV
+  #
+  #     - name: Update Kubeconfig
+  #       run: |
+  #         aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_PROD_NAME }} --region ${{ vars.AWS_REGION }}
+  #
+  #     - name: Get AWS Account ID
+  #       id: account
+  #       run: echo "id=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
+  #
+  #     - name: Deploy to EKS (Prod)
+  #       env:
+  #         IMAGE_TAG: ${{ needs.containerization.outputs.image_tag }}
+  #         ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+  #         ECR_REPOSITORY: "${{ vars.PROJECT_NAME }}/app"
+  #         PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+  #         ACM_CERT_ARN: ${{ vars.ACM_CERT_PROD_ARN }}
+  #         WAF_ACL_ARN: ${{ vars.WAF_ACL_PROD_ARN }}
+  #         DOMAIN_NAME: ${{ vars.DOMAIN_PROD_NAME }}
+  #         DB_HOST: ${{ vars.DB_PROD_HOST }}
+  #         DB_NAME: ${{ vars.DB_NAME }}
+  #         DB_USER: ${{ vars.DB_USER }}
+  #         S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+  #         APP_ROLE_ARN: "arn:aws:iam::${{ steps.account.outputs.id }}:role/${{ vars.PROJECT_NAME }}-prod-app-s3-role"
+  #       run: |
+  #         DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/prod/rds/db-admin-password --query SecretString --output text)
+  #         export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
+  #         mkdir -p app/k8s/generated
+  #         envsubst < app/k8s/templates/namespace.yaml.tmpl > app/k8s/generated/namespace.yaml
+  #         envsubst < app/k8s/templates/network-policy.yaml.tmpl > app/k8s/generated/network-policy.yaml
+  #         envsubst < app/k8s/templates/app.yaml.tmpl > app/k8s/generated/app.yaml
+  #         envsubst < app/k8s/templates/ingress.yaml.tmpl > app/k8s/generated/ingress.yaml
+  #         kubectl apply -f app/k8s/generated/namespace.yaml
+  #         kubectl apply -f app/k8s/generated/network-policy.yaml
+  #         kubectl apply -f app/k8s/generated/app.yaml
+  #         kubectl apply -f app/k8s/generated/ingress.yaml
+  #         kubectl rollout status deployment/${PROJECT_NAME}-app -n ${PROJECT_NAME} --timeout=180s
+  #         ALB_HOSTNAME=""
+  #         for i in {1..36}; do
+  #           ALB_HOSTNAME=$(kubectl get ingress ${PROJECT_NAME}-ingress -n ${PROJECT_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
+  #           if [ -n "$ALB_HOSTNAME" ]; then break; fi
+  #           sleep 5
+  #         done
+  #         ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN_NAME" --query "HostedZones[0].Id" --output text | cut -d'/' -f3)
+  #         aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch "{
+  #           \"Changes\": [{\"Action\": \"UPSERT\", \"ResourceRecordSet\": {\"Name\": \"${DOMAIN_NAME}.\", \"Type\": \"A\", \"AliasTarget\": {\"HostedZoneId\": \"Z32O12XQLNTSW2\", \"DNSName\": \"${ALB_HOSTNAME}.\", \"EvaluateTargetHealth\": false}}}]
+  #         }"
 # Trigger Deployment
