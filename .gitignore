@@ -44,3 +44,6 @@ build/
 bin/
 cosign
 pandoc
+
+# Local Drafts
+VIDEO_PITCH.md
