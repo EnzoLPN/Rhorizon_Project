@@ -1,40 +1,32 @@
-# 🚀 Projet ASD - Landing Zone & App Sécurisée (EKS)
+# 🎓 Projet de Fin d'Année - Bachelor : Architecture de Services Déployés (ASD)
 
-Bienvenue sur le projet **ASD (Architecture de Services Déployés)**. Ce dépôt contient une infrastructure complète de type "Landing Zone" sur AWS, ainsi qu'une application unifiée (Frontend + Backend) déployée sur un cluster EKS sécurisé.
+## 🌟 Présentation du Projet
+Ce dépôt constitue le projet final de Bachelor, réalisé par **Enzo, Loppin et Antimi**. 
 
-## 🏗️ Architecture du Projet
+L'objectif de ce projet est de concevoir et déployer une **Landing Zone AWS industrielle**, hautement sécurisée et entièrement modulaire. Il ne s'agit pas seulement d'un déploiement applicatif, mais d'une démonstration de maîtrise de l'infrastructure moderne (IaC), de la sécurité Cloud (conformité ANSSI) et de l'orchestration de conteneurs à l'échelle.
 
-Le projet repose sur une architecture multi-comptes et une gestion d'infrastructure moderne :
+## 🏗️ Philosophie du Projet : Modularité & Scalabilité
+La force de cette architecture réside dans sa **conception modulaire** :
+*   **Modules Terraform Agnostiques :** Chaque composant (Réseau, EKS, RDS, ECR) est encapsulé dans un module réutilisable, permettant une portabilité entre environnements.
+*   **Approche Multi-Comptes :** Isolation stricte des responsabilités (Shared Services, Non-Prod, Prod) pour limiter le rayon d'impact en cas d'incident.
+*   **Déploiement Unifié :** Transition d'une architecture multi-conteneurs vers un monolithe unifié (Nginx + Gunicorn) pour optimiser les ressources tout en conservant une séparation logique des services.
 
-*   **Infrastructure as Code (IaC) :** Terraform (Multi-comptes AWS).
-*   **Orchestration :** Amazon EKS (Kubernetes) avec des noeuds privés.
-*   **Base de Données :** Amazon RDS (PostgreSQL) avec authentification IAM.
-*   **Sécurité :** AWS WAF, KMS (Chiffrement au repos), OIDC pour CI/CD, et principes de privilège minimal (Non-root).
-*   **Réseau :** VPC avec sous-réseaux privés, Application Load Balancer (ALB) et Route 53.
-*   **CI/CD :** GitHub Actions avec déploiement automatique vers ECR et EKS.
+## 🛠️ Stack Technique & Expertise
+*   **Infrastructure :** Terraform (Multi-comptes AWS), VPC Peering/Transit, KMS Encryption.
+*   **Orchestration :** Amazon EKS (Kubernetes 1.32) avec Node Groups privés.
+*   **Backend & Front :** Python (Flask/Gunicorn) & Nginx, conteneurisés et sécurisés.
+*   **CI/CD :** Pipeline GitHub Actions automatisé (Build, Scan de vulnérabilités, Signature Cosign, Déploiement).
+*   **Sécurité :** Authentification IAM pour RDS, WAF v2, Secrets Manager, Isolation réseau totale.
 
-## 📁 Structure du Dépôt
+## 🛡️ Conformité & Sécurité
+Le projet a été conçu selon les meilleures pratiques de sécurité :
+*   **Zero Trust :** Aucun service n'est exposé sans filtrage (ALB/WAF).
+*   **Principe de moindre privilège :** Rôles IAM IRSA granulaires pour chaque Pod et utilisateur non-root pour les conteneurs.
+*   **Auditabilité :** Centralisation des logs S3 et chiffrement systématique des données au repos.
 
-```text
-.
-├── app/               # Code de l'application unifiée (Python/Nginx) et manifests K8s
-├── live/              # Configuration Terraform par environnement (shared, nonprod, prod)
-├── modules/           # Modules Terraform réutilisables (Network, EKS, RDS, ECR, etc.)
-├── README.md          # Présentation du projet
-└── RUNBOOK.md         # Guide technique de déploiement et prérequis
-```
-
-## 🛡️ Fonctionnalités de Sécurité (Conformité ANSSI)
-
-*   **Zéro Exposition Publique :** Le cluster EKS et la base RDS sont dans des sous-réseaux privés sans accès direct depuis Internet.
-*   **Authentification Forte :** Utilisation de l'authentification IAM pour la base de données (pas de mots de passe statiques).
-*   **Sécurité des Conteneurs :** Images basées sur Debian Slim, exécution en mode non-root, et scan Trivy/Bandit dans le pipeline.
-*   **Protection Web :** WAF configuré sur l'Ingress pour bloquer les attaques courantes (SQLi, XSS).
-*   **Gestion des Secrets :** Utilisation d'AWS Secrets Manager pour les données sensibles.
-
-## 🚀 Commencer
-
-Pour déployer ce projet, veuillez vous référer au fichier **[RUNBOOK.md](./RUNBOOK.md)** qui détaille toutes les étapes de configuration et de déploiement.
+## 🚀 Déploiement
+Pour comprendre comment mettre en place cette infrastructure de zéro, consultez le **[RUNBOOK.md](./RUNBOOK.md)**.
 
 ---
-*Projet réalisé dans le cadre de la formation ASD.*
+**Étudiants :** Enzo, Loppin, Antimi  
+**Promotion :** Bachelor ASD 2026
