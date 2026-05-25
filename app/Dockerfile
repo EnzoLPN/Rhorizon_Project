@@ -44,7 +44,7 @@ RUN echo 'server { \
 }' > /etc/nginx/sites-available/default
 
 # Configuration Supervisor pour lancer Nginx + Gunicorn
-RUN echo "[supervisord]\nnodaemon=true\nuser=root\n\n[program:gunicorn]\ncommand=gunicorn --bind 127.0.0.1:5000 --workers 2 app:app\nautostart=true\nautorestart=true\n\n[program:nginx]\ncommand=nginx -g \"daemon off;\"\nautostart=true\nautorestart=true" > /etc/supervisord.conf
+RUN echo "[supervisord]\nnodaemon=true\nlogfile=/tmp/supervisord.log\npidfile=/tmp/supervisord.pid\n\n[program:gunicorn]\ncommand=gunicorn --bind 127.0.0.1:5000 --workers 2 app:app\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n\n[program:nginx]\ncommand=nginx -g \"daemon off;\"\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0" > /etc/supervisord.conf
 
 # Sécurisation des permissions pour utilisateur non-root
 RUN groupadd -g 10001 appgroup && \
