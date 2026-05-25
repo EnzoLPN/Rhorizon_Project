@@ -13,23 +13,26 @@ Avant de commencer, assurez-vous d'avoir :
     *   `shared-services` : Héberge l'OIDC GitHub, ECR et les logs.
     *   `nonprod` : Environnement de test (EKS, RDS).
     *   `prod` : Environnement de production.
-
 ## 🏗️ 2. Déploiement Infrastructure (Terraform)
 
-Le déploiement doit se faire dans l'ordre suivant :
+Le déploiement suit une logique hiérarchique stricte, commençant par le compte **Master** pour poser les bases de l'organisation.
 
-### Étape A : Shared Services
-1.  Allez dans `live/shared-services/`.
-2.  Mettez à jour les variables dans `variables.tf` (ID de comptes, organisation GitHub).
+### Étape 0 : Global Organization & SSO (Compte Master)
+> [!NOTE]
+> Cette étape est cruciale car elle crée physiquement les comptes AWS (`shared-services`, `nonprod`, `prod`) au sein de l'organisation.
+
+1.  Allez dans `live/global-org/`.
+2.  Assurez-vous d'être authentifié sur le compte **Master**.
 3.  Exécutez :
     ```bash
     terraform init
     terraform apply
     ```
-4.  Notez l'ARN du rôle GitHub Actions (`github_actions_nonprod_role_arn`).
+4.  **Action Manuelle (SSO) :** Une fois les comptes créés, connectez-vous à la console AWS du compte **Master** et activez **AWS IAM Identity Center (SSO)**. Configurez vos utilisateurs et affectez-les aux groupes/comptes créés pour obtenir vos profils `aws-shared`, `aws-nonprod`, etc.
 
-### Étape B : Environnement Non-Prod
-1.  Allez dans `live/nonprod/`.
+### Étape A : Shared Services (Compte Shared)
+1.  Allez dans `live/shared-services/`.
+...
 2.  Vérifiez que le chemin vers le `remote_state` de shared-services est correct.
 3.  Exécutez :
     ```bash
