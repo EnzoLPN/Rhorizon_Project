@@ -133,7 +133,7 @@ jobs:
         id: account
         run: echo "id=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
 
-      - name: Deploy App
+      - name: Deploy to EKS
         env:
           IMAGE_TAG: ${{ needs.build-and-scan.outputs.image_tag }}
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
@@ -148,9 +148,40 @@ jobs:
           S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
           APP_ROLE_ARN: "arn:aws:iam::${{ steps.account.outputs.id }}:role/${{ vars.PROJECT_NAME }}-nonprod-app-s3-role"
         run: |
+          # 1. Préparer les secrets
           DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/nonprod/rds/db-admin-password --query SecretString --output text)
           export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
-          ./app/k8s/deploy.sh
+          
+          # 2. Interpolation des manifests
+          mkdir -p app/k8s/generated
+          envsubst < app/k8s/templates/namespace.yaml.tmpl > app/k8s/generated/namespace.yaml
+          envsubst < app/k8s/templates/network-policy.yaml.tmpl > app/k8s/generated/network-policy.yaml
+          envsubst < app/k8s/templates/app.yaml.tmpl > app/k8s/generated/app.yaml
+          envsubst < app/k8s/templates/ingress.yaml.tmpl > app/k8s/generated/ingress.yaml
+          
+          # 3. Application K8s
+          kubectl apply -f app/k8s/generated/namespace.yaml
+          kubectl apply -f app/k8s/generated/network-policy.yaml
+          kubectl apply -f app/k8s/generated/app.yaml
+          kubectl apply -f app/k8s/generated/ingress.yaml
+          
+          # 4. Attente du déploiement
+          kubectl rollout status deployment/${PROJECT_NAME}-app -n ${PROJECT_NAME} --timeout=180s
+          
+          # 5. Mise à jour DNS Route 53
+          ALB_HOSTNAME=""
+          for i in {1..36}; do
+            ALB_HOSTNAME=$(kubectl get ingress ${PROJECT_NAME}-ingress -n ${PROJECT_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
+            if [ -n "$ALB_HOSTNAME" ]; then break; fi
+            sleep 5
+          done
+          
+          if [ -z "$ALB_HOSTNAME" ]; then echo "❌ Timeout ALB"; exit 1; fi
+          
+          ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN_NAME" --query "HostedZones[0].Id" --output text | cut -d'/' -f3)
+          aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch "{
+            \"Changes\": [{\"Action\": \"UPSERT\", \"ResourceRecordSet\": {\"Name\": \"${DOMAIN_NAME}.\", \"Type\": \"A\", \"AliasTarget\": {\"HostedZoneId\": \"Z32O12XQLNTSW2\", \"DNSName\": \"${ALB_HOSTNAME}.\", \"EvaluateTargetHealth\": false}}}]
+          }"
 
   dast-scan:
     name: 🕸️ Dynamic Analysis (DAST)
@@ -197,7 +228,7 @@ jobs:
         id: account
         run: echo "id=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
 
-      - name: Deploy App
+      - name: Deploy to EKS
         env:
           IMAGE_TAG: ${{ needs.build-and-scan.outputs.image_tag }}
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
@@ -212,6 +243,37 @@ jobs:
           S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
           APP_ROLE_ARN: "arn:aws:iam::${{ steps.account.outputs.id }}:role/${{ vars.PROJECT_NAME }}-prod-app-s3-role"
         run: |
+          # 1. Préparer les secrets
           DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/prod/rds/db-admin-password --query SecretString --output text)
           export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
-          ./app/k8s/deploy.sh
+          
+          # 2. Interpolation des manifests
+          mkdir -p app/k8s/generated
+          envsubst < app/k8s/templates/namespace.yaml.tmpl > app/k8s/generated/namespace.yaml
+          envsubst < app/k8s/templates/network-policy.yaml.tmpl > app/k8s/generated/network-policy.yaml
+          envsubst < app/k8s/templates/app.yaml.tmpl > app/k8s/generated/app.yaml
+          envsubst < app/k8s/templates/ingress.yaml.tmpl > app/k8s/generated/ingress.yaml
+          
+          # 3. Application K8s
+          kubectl apply -f app/k8s/generated/namespace.yaml
+          kubectl apply -f app/k8s/generated/network-policy.yaml
+          kubectl apply -f app/k8s/generated/app.yaml
+          kubectl apply -f app/k8s/generated/ingress.yaml
+          
+          # 4. Attente du déploiement
+          kubectl rollout status deployment/${PROJECT_NAME}-app -n ${PROJECT_NAME} --timeout=180s
+          
+          # 5. Mise à jour DNS Route 53
+          ALB_HOSTNAME=""
+          for i in {1..36}; do
+            ALB_HOSTNAME=$(kubectl get ingress ${PROJECT_NAME}-ingress -n ${PROJECT_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
+            if [ -n "$ALB_HOSTNAME" ]; then break; fi
+            sleep 5
+          done
+          
+          if [ -z "$ALB_HOSTNAME" ]; then echo "❌ Timeout ALB"; exit 1; fi
+          
+          ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN_NAME" --query "HostedZones[0].Id" --output text | cut -d'/' -f3)
+          aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch "{
+            \"Changes\": [{\"Action\": \"UPSERT\", \"ResourceRecordSet\": {\"Name\": \"${DOMAIN_NAME}.\", \"Type\": \"A\", \"AliasTarget\": {\"HostedZoneId\": \"Z32O12XQLNTSW2\", \"DNSName\": \"${ALB_HOSTNAME}.\", \"EvaluateTargetHealth\": false}}}]
+          }"
