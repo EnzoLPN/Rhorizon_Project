@@ -24,6 +24,24 @@ Le projet a été conçu selon les meilleures pratiques de sécurité :
 *   **Principe de moindre privilège :** Rôles IAM IRSA granulaires pour chaque Pod et utilisateur non-root pour les conteneurs.
 *   **Auditabilité :** Centralisation des logs S3 et chiffrement systématique des données au repos.
 
+## 📦 Modules Terraform
+Ce projet est construit sur une bibliothèque de modules personnalisés, documentés automatiquement via `terraform-docs` :
+
+| Module | Description | Documentation |
+| :--- | :--- | :--- |
+| **Accounts Baseline** | Gouvernance (OU, Comptes, SCP, CloudTrail) | [Consulter](./modules/accounts-baseline/README.md) |
+| **Core Network** | Fondation réseau (VPC, Subnets, NAT) | [Consulter](./modules/core-network/README.md) |
+| **EKS Basic** | Cluster EKS, Node Groups & IAM Access | [Consulter](./modules/eks-basic/README.md) |
+| **RDS Database** | Instance PostgreSQL sécurisée | [Consulter](./modules/rds-database/README.md) |
+| **Shared ECR** | Registre de conteneurs centralisé | [Consulter](./modules/shared-ecr/README.md) |
+| **DNS & Ingress** | Exposition (Route53, ACM, WAF) | [Consulter](./modules/dns-ingress/README.md) |
+| **CI/CD Infra** | Fédération OIDC & Rôles GitHub | [Consulter](./modules/cicd-infra/README.md) |
+| **Observability** | Monitoring (Prometheus, Grafana) | [Consulter](./modules/observability/README.md) |
+| **Secrets Management** | Intégration Secrets Manager & EKS | [Consulter](./modules/secrets-management/README.md) |
+| **SSM Bastion** | Accès privé sécurisé (via SSM) | [Consulter](./modules/ssm-bastion/README.md) |
+| **Shared Core** | Socle S3 et clés KMS partagées | [Consulter](./modules/shared-core/README.md) |
+| **AWS LB Controller** | Gestionnaire Ingress ALB | [Consulter](./modules/aws-load-balancer-controller/README.md) |
+
 ## 🚀 Déploiement
 Pour comprendre comment mettre en place cette infrastructure de zéro, consultez le **[RUNBOOK.md](./RUNBOOK.md)**.
 
