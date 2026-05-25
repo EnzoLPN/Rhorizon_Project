@@ -13,8 +13,10 @@ ENV PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
-# Installation des dépendances système minimales
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Installation des dépendances système et mise à jour de sécurité (ANSSI)
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
     libpq-dev gcc && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
