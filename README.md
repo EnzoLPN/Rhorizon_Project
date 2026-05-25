@@ -29,4 +29,4 @@ Pour comprendre comment mettre en place cette infrastructure de zéro, consultez
 
 ---
 **Étudiants :** Enzo, Loppin, Antimi  
-**Promotion :** Bachelor ASD 2026
+**Promotion :** Bachelor ASD 2025
