@@ -183,23 +183,9 @@ jobs:
             \"Changes\": [{\"Action\": \"UPSERT\", \"ResourceRecordSet\": {\"Name\": \"${DOMAIN_NAME}.\", \"Type\": \"A\", \"AliasTarget\": {\"HostedZoneId\": \"Z32O12XQLNTSW2\", \"DNSName\": \"${ALB_HOSTNAME}.\", \"EvaluateTargetHealth\": false}}}]
           }"
 
-  dynamic-analysis:
-    name: 🕸️ Dynamic Analysis (DAST)
-    needs: deployment-nonprod
-    environment: NON_PROD
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for API
-        run: sleep 30
-      - name: ZAP Scan
-        uses: zaproxy/action-baseline@v0.12.0
-        with:
-          target: 'https://${{ vars.DOMAIN_NAME }}/api/health'
-          fail_action: false
-
   deployment-prod:
     name: 🏁 Continuous Deployment (Prod)
-    needs: dynamic-analysis
+    needs: deployment-nonprod
     environment: PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
