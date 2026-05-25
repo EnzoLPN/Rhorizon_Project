@@ -70,28 +70,28 @@ export ENVIRONMENT="nonprod"
 export AWS_REGION="eu-west-1"
 export IMAGE_TAG="latest"
 
-# Accès Registre (Compte Shared : 116101833976)
-export ECR_REGISTRY="116101833976.dkr.ecr.eu-west-1.amazonaws.com"
-export ECR_BACKEND_REPOSITORY="rhorizon/backend"
-export ECR_FRONTEND_REPOSITORY="rhorizon/frontend"
+# Accès Registre (Compte Shared)
+export ECR_REGISTRY="<COMPTE_SHARED_ID>.dkr.ecr.eu-west-1.amazonaws.com"
+export ECR_REPOSITORY="rhorizon/app"
 
-# Accès Base de Données (Support IAM Auth activé)
+# Accès Base de Données
 export DB_HOST="<RDS_ENDPOINT>"
 export DB_NAME="rhorizon_dev"
 export DB_USER="dbadmin"
 
-# Configuration Sécurité & Ingress
+# Configuration Sécurité, S3 & Ingress
 export DOMAIN_NAME="nonprod.rhorizon.xyz"
+export S3_BUCKET_NAME="<S3_ASSETS_BUCKET_NAME>"
 export ACM_CERT_ARN="<ACM_ARN_FROM_TERRAFORM_OUTPUT>"
 export WAF_ACL_ARN="<WAF_ARN_FROM_TERRAFORM_OUTPUT>"
-export BACKEND_ROLE_ARN="<BACKEND_IRSA_ROLE_ARN_FROM_TERRAFORM_OUTPUT>"
+export APP_ROLE_ARN="<APP_IRSA_ROLE_ARN_FROM_TERRAFORM_OUTPUT>"
 ```
 
 ### C. Lancement du Déploiement
 ```bash
 cd app/k8s
 chmod +x deploy.sh
-./deploy.sh all
+./deploy.sh
 ```
 
 ---

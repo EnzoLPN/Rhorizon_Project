@@ -129,6 +129,10 @@ jobs:
         run: |
           aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
 
+      - name: Get AWS Account ID
+        id: account
+        run: echo "id=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
+
       - name: Deploy App
         env:
           IMAGE_TAG: ${{ needs.build-and-scan.outputs.image_tag }}
@@ -142,11 +146,10 @@ jobs:
           DB_NAME: ${{ vars.DB_NAME }}
           DB_USER: ${{ vars.DB_USER }}
           S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
-          APP_ROLE_ARN: "arn:aws:iam::${{ steps.vars.outputs.account_id }}:role/${{ vars.PROJECT_NAME }}-nonprod-app-s3-role"
+          APP_ROLE_ARN: "arn:aws:iam::${{ steps.account.outputs.id }}:role/${{ vars.PROJECT_NAME }}-nonprod-app-s3-role"
         run: |
           DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/nonprod/rds/db-admin-password --query SecretString --output text)
           export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
-          # Note: account_id needs to be retrieved or passed via vars
           ./app/k8s/deploy.sh
 
   dast-scan:
@@ -190,10 +193,15 @@ jobs:
         run: |
           aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
 
+      - name: Get AWS Account ID
+        id: account
+        run: echo "id=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
+
       - name: Deploy App
         env:
           IMAGE_TAG: ${{ needs.build-and-scan.outputs.image_tag }}
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_REPOSITORY: "${{ vars.PROJECT_NAME }}/app"
           PROJECT_NAME: ${{ vars.PROJECT_NAME }}
           ACM_CERT_ARN: ${{ vars.ACM_CERT_ARN }}
           WAF_ACL_ARN: ${{ vars.WAF_ACL_ARN }}
@@ -201,8 +209,9 @@ jobs:
           DB_HOST: ${{ vars.DB_HOST }}
           DB_NAME: ${{ vars.DB_NAME }}
           DB_USER: ${{ vars.DB_USER }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          APP_ROLE_ARN: "arn:aws:iam::${{ steps.account.outputs.id }}:role/${{ vars.PROJECT_NAME }}-prod-app-s3-role"
         run: |
           DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/prod/rds/db-admin-password --query SecretString --output text)
           export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
-          export ECR_REPOSITORY="${PROJECT_NAME}/app"
-          ./app/k8s/deploy.sh all
+          ./app/k8s/deploy.sh
