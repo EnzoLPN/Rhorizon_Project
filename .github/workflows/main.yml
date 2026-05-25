@@ -16,8 +16,8 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: 🛡️ Validation & Tests
+  static-analysis:
+    name: 🔍 Static Analysis (SAST/SCA)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -51,9 +51,9 @@ jobs:
         run: |
           docker run --rm -v ${{ github.workspace }}:/apps aquasec/trivy:latest fs --severity HIGH,CRITICAL --exit-code 1 /apps/app/frontend
 
-  build-and-scan:
-    name: 🏗️ Unified Build & Push
-    needs: validate
+  containerization:
+    name: 🏗️ Containerization (Build & Scan)
+    needs: static-analysis
     environment: NON_PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -103,9 +103,9 @@ jobs:
             cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${{ vars.ECR_REGISTRY }}/${{ vars.PROJECT_NAME }}/app:${{ steps.vars.outputs.tag }}"
           fi
 
-  deploy-nonprod:
-    name: 🚀 Deploy to Non-Prod
-    needs: build-and-scan
+  deployment-nonprod:
+    name: 🚀 Continuous Deployment (Non-Prod)
+    needs: containerization
     environment: NON_PROD
     runs-on: ubuntu-latest
     steps:
@@ -135,7 +135,7 @@ jobs:
 
       - name: Deploy to EKS
         env:
-          IMAGE_TAG: ${{ needs.build-and-scan.outputs.image_tag }}
+          IMAGE_TAG: ${{ needs.containerization.outputs.image_tag }}
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
           ECR_REPOSITORY: "${{ vars.PROJECT_NAME }}/app"
           PROJECT_NAME: ${{ vars.PROJECT_NAME }}
@@ -183,9 +183,9 @@ jobs:
             \"Changes\": [{\"Action\": \"UPSERT\", \"ResourceRecordSet\": {\"Name\": \"${DOMAIN_NAME}.\", \"Type\": \"A\", \"AliasTarget\": {\"HostedZoneId\": \"Z32O12XQLNTSW2\", \"DNSName\": \"${ALB_HOSTNAME}.\", \"EvaluateTargetHealth\": false}}}]
           }"
 
-  dast-scan:
+  dynamic-analysis:
     name: 🕸️ Dynamic Analysis (DAST)
-    needs: deploy-nonprod
+    needs: deployment-nonprod
     environment: NON_PROD
     runs-on: ubuntu-latest
     steps:
@@ -197,9 +197,9 @@ jobs:
           target: 'https://${{ vars.DOMAIN_NAME }}/api/health'
           fail_action: false
 
-  deploy-prod:
-    name: 🏁 Deploy to Production
-    needs: dast-scan
+  deployment-prod:
+    name: 🏁 Continuous Deployment (Prod)
+    needs: dynamic-analysis
     environment: PROD
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -230,7 +230,7 @@ jobs:
 
       - name: Deploy to EKS
         env:
-          IMAGE_TAG: ${{ needs.build-and-scan.outputs.image_tag }}
+          IMAGE_TAG: ${{ needs.containerization.outputs.image_tag }}
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
           ECR_REPOSITORY: "${{ vars.PROJECT_NAME }}/app"
           PROJECT_NAME: ${{ vars.PROJECT_NAME }}
