@@ -4,12 +4,12 @@ Ce document détaille la logique de déploiement "Bootstrap" de la Landing Zone.
 
 ---
 
-## 🛠️ 1. Concept de Base : Le Compte "Semence" (Master)
+## 🛠️ 1. Concept de Base : Le Compte (Master)
 
 Avant de commencer, vous **devez** posséder un compte AWS existant qui servira de **Compte Master (Management Account)**. 
 
 ### Pourquoi un compte Master ?
-Dans une architecture multi-comptes industrielle, on n'utilise jamais le compte racine pour déployer des applications. Le compte Master a trois rôles uniques :
+Dans une architecture multi-comptes industrielle, on n'utilise jamais le compte Root pour déployer des applications. Le compte Master a trois rôles uniques :
 1.  **Provisionnement :** Il possède les droits programmatiques pour créer de nouveaux comptes AWS sans intervention manuelle via l'API `Organizations`.
 2.  **Gouvernance :** Il applique les `Service Control Policies (SCP)` pour restreindre ce que les autres comptes ont le droit de faire (ex: interdire de quitter l'organisation).
 3.  **Identité :** Il centralise l'authentification via AWS SSO (IAM Identity Center).
