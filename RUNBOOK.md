@@ -13,7 +13,7 @@ Avant de lancer le projet, assurez-vous d'avoir installé les outils suivants su
 *   **AWS Session Manager Plugin** : **Obligatoire** pour pouvoir ouvrir des sessions sur le Bastion privé.
 *   **Terraform** (version >= 1.9.0) : Pour déployer la Landing Zone.
 *   **kubectl** (version >= 1.30) : Pour piloter les clusters EKS.
-*   **Helm** (version >= 3.0) : Pour installer l'observabilité.
+*   **Helm** (version >= 3.0) : Requis par Terraform pour l'installation automatique de l'observabilité.
 
 ---
 
@@ -32,6 +32,7 @@ aws sso login --profile <nom_du_profil>
 
 > [!IMPORTANT]
 > Par mesure de sécurité (prévention supply-chain attack), les pipelines d'infrastructure automatisés ont été supprimés. Le déploiement se fait manuellement depuis votre poste (ou bastion) après validation locale.
+> **L'installation du Monitoring (Prometheus, Grafana, Fluent Bit) est incluse dans le déploiement Terraform.**
 
 ### Étape 1 : Shared Services (Central)
 ```bash
@@ -43,7 +44,7 @@ terraform init && terraform apply
 ### Étape 2 : Environnement Applicatif (Non-Prod ou Prod)
 ```bash
 cd ../nonprod # ou ../prod
-aws sso login --profile aws-nonprod
+aws sso login --profile aws-nonprod # ou aws-prod
 terraform init && terraform apply
 ```
 
@@ -59,8 +60,8 @@ L'API EKS n'est pas exposée sur Internet. Configurez votre accès :
 aws eks update-kubeconfig --region eu-west-1 --name nonprod-eks-cluster --profile aws-nonprod
 ```
 
-### B. Configuration des Variables (Prêt à l'emploi pour Non-Prod)
-Copiez-collez ce bloc en remplaçant `<ACCOUNT_ID_SHARED>` et `<RDS_ENDPOINT>` :
+### B. Configuration des Variables (Exemple pour Non-Prod)
+Les variables suivantes sont nécessaires pour le script de déploiement applicatif :
 
 ```bash
 # Variables Globales
@@ -69,22 +70,21 @@ export ENVIRONMENT="nonprod"
 export AWS_REGION="eu-west-1"
 export IMAGE_TAG="latest"
 
-# Accès Registre (Compte Shared)
-export ECR_REGISTRY="<ACCOUNT_ID_SHARED>.dkr.ecr.eu-west-1.amazonaws.com"
+# Accès Registre (Compte Shared : 116101833976)
+export ECR_REGISTRY="116101833976.dkr.ecr.eu-west-1.amazonaws.com"
 export ECR_BACKEND_REPOSITORY="rhorizon/backend"
 export ECR_FRONTEND_REPOSITORY="rhorizon/frontend"
 
 # Accès Base de Données (Support IAM Auth activé)
 export DB_HOST="<RDS_ENDPOINT>"
-export DB_NAME="rhorizon"
+export DB_NAME="rhorizon_dev"
 export DB_USER="dbadmin"
-export DB_PASSWORD_BASE64="Y2hhbmdlbWU=" # Non utilisé si USE_IAM_AUTH=true
 
 # Configuration Sécurité & Ingress
 export DOMAIN_NAME="nonprod.rhorizon.xyz"
-export ACM_CERT_ARN="arn:aws:acm:..." # Output de terraform nonprod
-export WAF_ACL_ARN="arn:aws:wafv2:..." # Output de terraform nonprod
-export BACKEND_ROLE_ARN="arn:aws:iam::<ACCOUNT_ID_NONPROD>:role/rhorizon-nonprod-eks-secrets-role"
+export ACM_CERT_ARN="<ACM_ARN_FROM_TERRAFORM_OUTPUT>"
+export WAF_ACL_ARN="<WAF_ARN_FROM_TERRAFORM_OUTPUT>"
+export BACKEND_ROLE_ARN="<BACKEND_IRSA_ROLE_ARN_FROM_TERRAFORM_OUTPUT>"
 ```
 
 ### C. Lancement du Déploiement
@@ -98,8 +98,11 @@ chmod +x deploy.sh
 
 ## 🔒 5. Spécificité Sécurité : IAM RDS Authentication
 
-L'application backend est configurée pour utiliser l'**Authentification IAM** au lieu d'un mot de passe statique.
-*   **En local (Docker/LocalStack)** : L'app utilise `DB_PASSWORD`.
-*   **Sur AWS (EKS)** : L'app détecte `USE_IAM_AUTH=true` et génère un jeton temporaire via son rôle IAM.
+L'application backend utilise l'**Authentification IAM** (recommandation ANSSI) au lieu d'un mot de passe statique.
+*   **Sur AWS (EKS)** : L'app détecte `USE_IAM_AUTH=true` et génère un jeton temporaire via son rôle IAM IRSA.
 
-**Action manuelle requise** : Après le premier déploiement, assurez-vous de créer l'utilisateur `dbadmin` dans RDS et de lui accorder le rôle `rds_iam` (voir section "Hardening RDS" du rapport).
+**Action manuelle requise** : Après le premier déploiement de RDS, connectez-vous via le Bastion et créez l'utilisateur avec les droits IAM :
+```sql
+CREATE USER dbadmin WITH LOGIN;
+GRANT rds_iam TO dbadmin;
+```

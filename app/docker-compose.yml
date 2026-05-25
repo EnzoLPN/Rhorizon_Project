@@ -1,34 +1,35 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: rhorizon-test-db
+    container_name: ${PROJECT_NAME:-rhorizon}-test-db
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-rhorizon_dev}
+      POSTGRES_USER: ${DB_USER:-dbadmin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     ports:
       - "${DB_HOST_PORT:-5433}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dbadmin} -d ${DB_NAME:-rhorizon_dev}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    container_name: rhorizon-test-backend
+      target: backend
+    container_name: ${PROJECT_NAME:-rhorizon}-test-backend
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
-      AWS_REGION: ${AWS_REGION}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-dbadmin}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
+      DB_NAME: ${DB_NAME:-rhorizon_dev}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-rhorizon-local-assets}
+      AWS_REGION: ${AWS_REGION:-eu-west-1}
       S3_ENDPOINT_URL: http://localstack:4566
       AWS_ACCESS_KEY_ID: mock
       AWS_SECRET_ACCESS_KEY: mock
@@ -42,9 +43,12 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: .
       dockerfile: Dockerfile
-    container_name: rhorizon-test-frontend
+      target: frontend
+    container_name: ${PROJECT_NAME:-rhorizon}-test-frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:${BACKEND_HOST_PORT:-5000}
     ports:
       - "${FRONTEND_HOST_PORT:-8080}:8080"
     depends_on:
@@ -52,7 +56,7 @@ services:
 
   localstack:
     image: localstack/localstack:3.8.0
-    container_name: rhorizon-test-localstack
+    container_name: ${PROJECT_NAME:-rhorizon}-test-localstack
     ports:
       - "127.0.0.1:4566:4566"
     environment:

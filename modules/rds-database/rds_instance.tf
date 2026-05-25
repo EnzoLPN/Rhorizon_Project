@@ -47,3 +47,16 @@ resource "aws_db_instance" "postgres" {
     ]
   }
 }
+
+# Règle optionnelle pour autoriser un Security Group externe (ex: Cluster EKS)
+resource "aws_security_group_rule" "ingress_external" {
+  count = var.create_external_ingress_rule ? 1 : 0
+
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = var.rds_security_group_id
+  source_security_group_id = var.allowed_security_group_id
+  description              = "Autoriser le trafic PostgreSQL depuis le Security Group externe"
+}

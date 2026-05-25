@@ -1,0 +1,295 @@
+name: App Pipeline
+
+on:
+  push:
+    paths:
+      - 'app/**'
+      - '.github/workflows/main.yml'
+  pull_request:
+    paths:
+      - 'app/**'
+      - '.github/workflows/main.yml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate-frontend:
+    name: 🛡️ Frontend Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy FS Scan
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/apps aquasec/trivy:latest fs --severity HIGH,CRITICAL --exit-code 1 /apps/app/frontend
+
+  validate-backend:
+    name: 🛡️ Backend Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          cd app/backend
+          pip install Flask Flask-Cors psycopg2-binary gunicorn boto3
+
+      - name: Run Unit Tests
+        run: |
+          cd app/backend
+          python -m unittest test_app
+
+      - name: Run Bandit (SAST)
+        run: |
+          pip install bandit
+          bandit -r app/backend/ -ll
+
+      - name: Run Pip-Audit (SCA)
+        run: |
+          pip install pip-audit
+          pip-audit -r app/backend/requirements.txt
+
+  build-frontend:
+    name: 🏗️ Frontend Build & Push
+    needs: validate-frontend
+    environment: NON_PROD
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.tag }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set variables
+        id: vars
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          TAG="${SHA_SHORT}-$(date +%Y%m%d-%H%M%S)"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Build image
+        run: |
+          docker build --target frontend -t ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_FRONTEND_REPOSITORY }}:${{ steps.vars.outputs.tag }} ./app
+
+      - name: Scan Image
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_FRONTEND_REPOSITORY }}:${{ steps.vars.outputs.tag }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push Image
+        run: |
+          docker push ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_FRONTEND_REPOSITORY }}:${{ steps.vars.outputs.tag }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Sign Image
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          if [ -n "$COSIGN_PRIVATE_KEY" ]; then
+            cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${{ vars.ECR_REGISTRY }}/${{ vars.ECR_FRONTEND_REPOSITORY }}:${{ steps.vars.outputs.tag }}"
+          fi
+
+  build-backend:
+    name: 🏗️ Backend Build & Push
+    needs: validate-backend
+    environment: NON_PROD
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.tag }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set variables
+        id: vars
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          TAG="${SHA_SHORT}-$(date +%Y%m%d-%H%M%S)"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Build image
+        run: |
+          docker build --target backend -t ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_BACKEND_REPOSITORY }}:${{ steps.vars.outputs.tag }} ./app
+
+      - name: Scan Image
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_BACKEND_REPOSITORY }}:${{ steps.vars.outputs.tag }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push Image
+        run: |
+          docker push ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_BACKEND_REPOSITORY }}:${{ steps.vars.outputs.tag }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Sign Image
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          if [ -n "$COSIGN_PRIVATE_KEY" ]; then
+            cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${{ vars.ECR_REGISTRY }}/${{ vars.ECR_BACKEND_REPOSITORY }}:${{ steps.vars.outputs.tag }}"
+          fi
+
+  deploy-nonprod:
+    name: 🚀 Deploy to Non-Prod
+    needs: [build-frontend, build-backend]
+    environment: NON_PROD
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Assume Cross-Account Role
+        run: |
+          ASSUME_OUTPUT=$(aws sts assume-role --role-arn "${{ vars.AWS_NONPROD_ROLE_ARN }}" --role-session-name "EKSDeploy" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+          echo "AWS_ACCESS_KEY_ID=$(echo "$ASSUME_OUTPUT" | awk '{print $1}')" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(echo "$ASSUME_OUTPUT" | awk '{print $2}')" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(echo "$ASSUME_OUTPUT" | awk '{print $3}')" >> $GITHUB_ENV
+
+      - name: Update Kubeconfig
+        run: |
+          aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
+
+      - name: Deploy Frontend
+        env:
+          IMAGE_TAG: ${{ needs.build-frontend.outputs.image_tag }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_FRONTEND_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
+          ACM_CERT_ARN: ${{ vars.ACM_CERT_ARN }}
+          WAF_ACL_ARN: ${{ vars.WAF_ACL_ARN }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+        run: ./app/k8s/deploy.sh frontend
+
+      - name: Deploy Backend
+        env:
+          IMAGE_TAG: ${{ needs.build-backend.outputs.image_tag }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_NAME: ${{ vars.DB_NAME }}
+          DB_USER: ${{ vars.DB_USER }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          BACKEND_ROLE_ARN: ${{ vars.BACKEND_ROLE_ARN }}
+          ACM_CERT_ARN: ${{ vars.ACM_CERT_ARN }}
+          WAF_ACL_ARN: ${{ vars.WAF_ACL_ARN }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+        run: |
+          DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/nonprod/rds/db-admin-password --query SecretString --output text)
+          export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
+          ./app/k8s/deploy.sh backend
+
+  dast-scan:
+    name: 🕸️ Dynamic Analysis (DAST)
+    needs: deploy-nonprod
+    environment: NON_PROD
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for API
+        run: sleep 30
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'https://${{ vars.DOMAIN_NAME }}/api/health'
+          fail_action: false
+
+  deploy-prod:
+    name: 🏁 Deploy to Production
+    needs: [dast-scan]
+    environment: PROD
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Assume Cross-Account Role
+        run: |
+          ASSUME_OUTPUT=$(aws sts assume-role --role-arn "${{ vars.AWS_PROD_ROLE_ARN }}" --role-session-name "EKSDeployProd" --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+          echo "AWS_ACCESS_KEY_ID=$(echo "$ASSUME_OUTPUT" | awk '{print $1}')" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(echo "$ASSUME_OUTPUT" | awk '{print $2}')" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(echo "$ASSUME_OUTPUT" | awk '{print $3}')" >> $GITHUB_ENV
+
+      - name: Update Kubeconfig
+        run: |
+          aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
+
+      - name: Deploy Frontend
+        env:
+          IMAGE_TAG: ${{ needs.build-frontend.outputs.image_tag }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_FRONTEND_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
+          ACM_CERT_ARN: ${{ vars.ACM_CERT_ARN }}
+          WAF_ACL_ARN: ${{ vars.WAF_ACL_ARN }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+        run: ./app/k8s/deploy.sh frontend
+
+      - name: Deploy Backend
+        env:
+          IMAGE_TAG: ${{ needs.build-backend.outputs.image_tag }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          ECR_BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_NAME: ${{ vars.DB_NAME }}
+          DB_USER: ${{ vars.DB_USER }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          BACKEND_ROLE_ARN: ${{ vars.BACKEND_ROLE_ARN }}
+          ACM_CERT_ARN: ${{ vars.ACM_CERT_ARN }}
+          WAF_ACL_ARN: ${{ vars.WAF_ACL_ARN }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+        run: |
+          DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${PROJECT_NAME}/prod/rds/db-admin-password --query SecretString --output text)
+          export DB_PASSWORD_BASE64=$(echo -n "$DB_PASSWORD" | base64)
+          ./app/k8s/deploy.sh backend

@@ -3,14 +3,20 @@ variable "environment" {
   description = "Environnement cible (nonprod ou prod)"
 }
 
-variable "oidc_provider_url" {
+variable "project_name" {
   type        = string
-  description = "URL du fournisseur OIDC EKS pour IRSA"
+  description = "Nom du projet (ex: rhorizon)"
+  default     = "rhorizon"
 }
 
 variable "oidc_provider_arn" {
   type        = string
   description = "ARN du fournisseur OIDC EKS pour IRSA"
+}
+
+variable "oidc_provider_url" {
+  type        = string
+  description = "URL du fournisseur OIDC EKS pour IRSA"
 }
 
 variable "logs_bucket_name" {
@@ -53,8 +59,14 @@ variable "waf_web_acl_arn" {
   default     = ""
 }
 
-variable "project_name" {
+variable "route53_zone_id" {
   type        = string
-  description = "Nom du projet (ex: rhorizon)"
-  default     = "rhorizon"
+  description = "ID de la zone Route 53 où créer l'enregistrement Grafana"
+  default     = ""
+}
+
+variable "create_grafana_dns_record" {
+  type        = bool
+  description = "Indique s'il faut créer l'enregistrement DNS Route 53 pour Grafana"
+  default     = false
 }

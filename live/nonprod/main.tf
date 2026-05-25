@@ -1,13 +1,22 @@
-# Lecture de l'état du compte shared-services pour récupérer les ARNs KMS et noms de buckets
+# Lecture de l'état du compte shared-services
 data "terraform_remote_state" "shared" {
   backend = "local"
-
   config = {
     path = var.shared_services_state_path
   }
 }
 
-# --- 1. Module Réseau (VPC, sous-réseaux, NAT, Route53 privé) ---
+# --- 0. IAM de Déploiement ---
+module "cicd_deploy_role" {
+  source = "../../modules/cicd-infra/target-role"
+
+  role_name        = "nonprod-eks-deploy-role"
+  trusted_role_arn = data.terraform_remote_state.shared.outputs.github_actions_nonprod_role_arn
+  environment      = var.environment
+  project_name     = var.project_name
+}
+
+# --- 1. Module Réseau ---
 module "network" {
   source = "../../modules/core-network"
 
@@ -23,7 +32,7 @@ module "network" {
   project_name             = var.project_name
 }
 
-# --- 2. Module Base de Données RDS (PostgreSQL) ---
+# --- 2. Module Base de Données RDS ---
 module "rds" {
   source = "../../modules/rds-database"
 
@@ -45,6 +54,10 @@ module "rds" {
   skip_final_snapshot     = true
   storage_encrypted       = true
   project_name            = var.project_name
+  
+  # Autoriser le trafic depuis le cluster EKS
+  create_external_ingress_rule = true
+  allowed_security_group_id    = module.eks_cluster.cluster_security_group_id
 }
 
 # --- 3. Module Cluster EKS ---
@@ -60,26 +73,48 @@ module "eks_cluster" {
   min_size           = var.eks_min_size
   max_size           = var.eks_max_size
 
-  admin_roles = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/OrganizationAccountAccessRole",
-    data.terraform_remote_state.shared.outputs.github_actions_nonprod_role_arn,
-    aws_iam_role.eks_deploy_role.arn
-  ]
+  admin_roles = {
+    organization_admin = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/OrganizationAccountAccessRole"
+    github_actions     = data.terraform_remote_state.shared.outputs.github_actions_nonprod_role_arn
+    eks_deploy         = module.cicd_deploy_role.role_arn
+  }
   project_name = var.project_name
+
+  # Configuration des rôles IRSA pour les workloads
+  irsa_roles = {
+    backend = {
+      role_name       = "${var.project_name}-${var.environment}-backend-s3-role"
+      service_account = "${var.project_name}-backend-sa"
+      namespace       = var.project_name
+      policy_json     = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+          { Sid = "S3Access", Effect = "Allow", Action = ["s3:*"], Resource = [data.terraform_remote_state.shared.outputs.bucket_assets_arn, "${data.terraform_remote_state.shared.outputs.bucket_assets_arn}/*"] },
+          { Sid = "KMSAccess", Effect = "Allow", Action = ["kms:Decrypt", "kms:GenerateDataKey"], Resource = data.terraform_remote_state.shared.outputs.kms_assets_key_arn },
+          { Sid = "RDSIAMAuth", Effect = "Allow", Action = "rds-db:connect", Resource = "arn:aws:rds-db:${var.aws_region}:${data.aws_caller_identity.current.account_id}:dbuser:*/dbadmin" }
+        ]
+      })
+    }
+  }
 }
 
-# --- 4. Module DNS et Ingress (Route53 public + ACM + WAF) ---
+# --- 4. Module DNS et Ingress ---
 module "dns_ingress" {
   source = "../../modules/dns-ingress"
+
+  providers = {
+    aws.shared = aws.shared
+  }
 
   environment               = var.environment
   domain_name               = var.domain_name
   create_public_zone        = true
   enable_extended_waf_rules = false
   project_name              = var.project_name
+  parent_zone_name          = "rhorizon.xyz"
 }
 
-# --- 5. Module Gestion des Secrets (CSI Driver + IRSA) ---
+# --- 5. Module Gestion des Secrets ---
 module "secrets_management" {
   source = "../../modules/secrets-management"
 
@@ -107,7 +142,7 @@ module "aws_load_balancer_controller" {
   project_name = var.project_name
 }
 
-# --- 6. Module Observabilité (Prometheus Stack + Grafana + Fluent Bit) ---
+# --- 6. Module Observabilité ---
 module "observability" {
   source = "../../modules/observability"
 
@@ -117,31 +152,18 @@ module "observability" {
   logs_bucket_name  = data.terraform_remote_state.shared.outputs.bucket_logs_id
   kms_logs_key_arn  = data.terraform_remote_state.shared.outputs.kms_logs_key_arn
 
-  grafana_ingress_enabled = true
-  grafana_domain_name     = "grafana.${var.domain_name}"
-  acm_certificate_arn     = module.dns_ingress.acm_certificate_arn
-  waf_web_acl_arn         = module.dns_ingress.waf_web_acl_arn
+  grafana_ingress_enabled   = true
+  create_grafana_dns_record = true
+  grafana_domain_name       = "grafana.${var.domain_name}"
+  acm_certificate_arn       = module.dns_ingress.acm_certificate_arn
+  waf_web_acl_arn           = module.dns_ingress.waf_web_acl_arn
+  route53_zone_id           = module.dns_ingress.route53_zone_id
 
   depends_on   = [module.eks_cluster, module.aws_load_balancer_controller]
   project_name = var.project_name
 }
 
-# --- 7. Delegation Route53 automatique de nonprod.rhorizon.xyz dans la zone parente (compte shared) ---
-data "aws_route53_zone" "parent" {
-  provider = aws.shared
-  name     = "rhorizon.xyz"
-}
-
-resource "aws_route53_record" "nonprod_delegation" {
-  provider = aws.shared
-  zone_id  = data.aws_route53_zone.parent.zone_id
-  name     = var.domain_name
-  type     = "NS"
-  ttl      = 300
-  records  = module.dns_ingress.route53_zone_name_servers
-}
-
-# --- 9. Module Bastion SSM (Accès RDS sécurisé) ---
+# --- 9. Module Bastion SSM ---
 module "ssm_bastion" {
   source = "../../modules/ssm-bastion"
 
@@ -152,78 +174,5 @@ module "ssm_bastion" {
   project_name          = var.project_name
 }
 
-# --- 10. Rôle IAM et Politique pour IRSA (Accès S3 du Backend) ---
-resource "aws_iam_policy" "backend_s3_access" {
-  name        = "${var.environment}-backend-s3-policy"
-  description = "Politique autorisant le backend EKS a acceder au bucket S3 d assets"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "S3Access"
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          data.terraform_remote_state.shared.outputs.bucket_assets_arn,
-          "${data.terraform_remote_state.shared.outputs.bucket_assets_arn}/*"
-        ]
-      },
-      {
-        Sid    = "KMSAccess"
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = data.terraform_remote_state.shared.outputs.kms_assets_key_arn
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role" "backend_s3_role" {
-  name = "${var.project_name}-${var.environment}-backend-s3-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Federated = module.eks_cluster.oidc_provider_arn
-        }
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Condition = {
-          StringEquals = {
-            "${replace(module.eks_cluster.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:${var.project_name}:${var.project_name}-backend-sa"
-          }
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "backend_s3_attach" {
-  role       = aws_iam_role.backend_s3_role.name
-  policy_arn = aws_iam_policy.backend_s3_access.arn
-}
-
-# --- 11. Règle de sécurité pour autoriser le trafic de l'EKS vers RDS ---
-resource "aws_security_group_rule" "rds_ingress_from_eks_cluster" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  security_group_id        = module.network.rds_security_group_id
-  source_security_group_id = module.eks_cluster.cluster_security_group_id
-  description              = "Autoriser le trafic PostgreSQL depuis EKS (Cluster SG)"
-}
-
-# --- 12. Identité appelante ---
+# --- 10. Identité appelante ---
 data "aws_caller_identity" "current" {}

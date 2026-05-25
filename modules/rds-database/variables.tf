@@ -92,3 +92,15 @@ variable "project_name" {
   description = "Nom du projet (ex: rhorizon)"
   default     = "rhorizon"
 }
+
+variable "allowed_security_group_id" {
+  type        = string
+  description = "ID du Security Group externe (ex: EKS) a autoriser sur le port 5432"
+  default     = ""
+}
+
+variable "create_external_ingress_rule" {
+  type        = bool
+  description = "Indique s'il faut créer la règle d'ingress pour le Security Group externe"
+  default     = false
+}

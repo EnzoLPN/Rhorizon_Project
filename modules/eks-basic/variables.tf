@@ -44,13 +44,24 @@ variable "max_size" {
 }
 
 variable "admin_roles" {
-  type        = list(string)
-  description = "Liste des ARN de rôles IAM à qui donner les droits cluster-admin via EKS Access Entries"
-  default     = []
+  type        = map(string)
+  description = "Map des noms et ARNs de rôles IAM à qui donner les droits cluster-admin via EKS Access Entries"
+  default     = {}
 }
 
 variable "project_name" {
   type        = string
   description = "Nom du projet (ex: rhorizon)"
   default     = "rhorizon"
+}
+
+variable "irsa_roles" {
+  type = map(object({
+    role_name          = string
+    service_account    = string
+    namespace          = string
+    policy_json        = string
+  }))
+  description = "Map des rôles IRSA à créer pour les workloads EKS"
+  default     = {}
 }
