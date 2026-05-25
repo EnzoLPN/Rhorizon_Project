@@ -13,11 +13,28 @@ Dès sa conception, le projet a été bâti sur trois piliers fondamentaux :
 *   **Reproductibilité :** L'utilisation de variables dynamiques permet de cloner et redéployer l'intégralité de la Landing Zone de manière automatisée, éliminant les erreurs humaines liées aux configurations manuelles.
 *   **Souveraineté des Données :** Utilisation du chiffrement KMS et d'une isolation réseau 3-tiers (Public/Privé/Data) pour garantir le contrôle total sur le cycle de vie des données sensibles.
 
+## 🛡️ Principes de Sécurité Appliqués (ANSSI DevSecOps V1.0)
+
+1.  **Ségrégation stricte des environnements**
+    *   Architecture AWS Multi-Comptes (Root, Shared, Non-Prod, Prod).
+2.  **Maîtrise des flux et Filtrage périmétrique**
+    *   Protection frontale via **AWS WAFv2** (Règles étendues OWASP).
+    *   Flux AWS internalisés via **VPC Endpoints** (AWS PrivateLink).
+3.  **Protection des identités et des secrets (Zéro Trust)**
+    *   Suppression des clés d'accès statiques au profit d'**OIDC** (GitHub Actions).
+    *   Moindre privilège applicatif avec **IAM Roles for Service Accounts (IRSA)**.
+4.  **Intégrité de la chaîne logicielle (Supply Chain)**
+    *   Scans de vulnérabilités automatisés (**Bandit, Pip-Audit, Trivy**).
+    *   Signature cryptographique des images (**Cosign**).
+5.  **Chiffrement et Immutabilité (Auditabilité)**
+    *   Chiffrement de bout en bout (**TLS** en transit, **KMS** au repos).
+    *   Centralisation des logs d'audit avec **S3 Object Lock** (Immutabilité).
+
 ## 🛠️ Stack Technique & Expertise
 *   **Infrastructure as Code :** Architecture multi-comptes AWS pilotée par Terraform (VPC Peering, PrivateLink, KMS).
 *   **Orchestration :** Cluster Amazon EKS avec Node Groups privés et sécurisés.
 *   **Base de Données :** Amazon RDS PostgreSQL avec authentification IAM (Zéro mot de passe statique).
-*   **CI/CD DevSecOps :** Pipeline GitHub Actions automatisé incluant SAST/SCA, scan d'images et signature cryptographique via **Cosign**.
+*   **CI/CD DevSecOps :** Pipeline GitHub Actions automatisé incluant SAST/SCA, scan d'images et signature cryptographique.
 *   **Sécurité Edge :** AWS WAF et certificats SSL gérés pour une exposition sécurisée.
 
 ## 📦 Modules Terraform
@@ -38,5 +55,5 @@ Ce projet repose sur une bibliothèque de modules personnalisés, conçus pour �
 Pour comprendre comment initialiser l'Organisation AWS (Compte Master) et déployer cette architecture, consultez le **[RUNBOOK.md](./RUNBOOK.md)**.
 
 ---
-**Étudiant :** Enzo Loppin & Antimi  
+**Étudiants :** Enzo Loppin & Antimi  
 **Promotion :** Bachelor ASD 2026
